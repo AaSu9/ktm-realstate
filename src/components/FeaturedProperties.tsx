@@ -1,48 +1,49 @@
 import PropertyCard from './PropertyCard';
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
-import property1 from '@/assets/property-1.jpg';
-import property2 from '@/assets/property-2.jpg';
-import property3 from '@/assets/property-3.jpg';
+import { supabase } from '@/integrations/supabase/client';
+import { useEffect, useState } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+
+interface Property {
+  id: string;
+  title: string;
+  location: string;
+  price: number;
+  images: string[];
+  bedrooms?: number;
+  bathrooms?: number;
+  area_sqft?: number;
+  property_type: string;
+  is_featured: boolean;
+  is_hot_deal: boolean;
+  discount_percentage: number;
+}
 
 const FeaturedProperties = () => {
-  const properties = [
-    {
-      id: '1',
-      title: 'Luxury Mountain View Villa',
-      location: 'Budhanilkantha, Kathmandu',
-      price: 'Rs. 2.5 Crore',
-      image: property1,
-      bedrooms: 4,
-      bathrooms: 3,
-      area: '3,500 sq ft',
-      type: 'sale' as const,
-      featured: true,
-      discount: '10% Off'
-    },
-    {
-      id: '2',
-      title: 'Modern Apartment Complex',
-      location: 'New Baneshwor, Kathmandu',
-      price: 'Rs. 85 Lakh',
-      image: property2,
-      bedrooms: 3,
-      bathrooms: 2,
-      area: '1,200 sq ft',
-      type: 'sale' as const,
-      featured: true
-    },
-    {
-      id: '3',
-      title: 'Premium Development Land',
-      location: 'Bhaktapur, Nepal',
-      price: 'Rs. 45 Lakh',
-      image: property3,
-      area: '5 Ropani',
-      type: 'sale' as const,
-      featured: true
-    }
-  ];
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProperties = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('properties')
+          .select('*')
+          .eq('is_featured', true)
+          .limit(6);
+
+        if (error) throw error;
+        setProperties(data || []);
+      } catch (error) {
+        console.error('Error fetching properties:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProperties();
+  }, []);
 
   return (
     <section id="properties" className="py-20 bg-muted/30">
@@ -60,17 +61,49 @@ const FeaturedProperties = () => {
         </div>
 
         {/* Properties Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-          {properties.map((property, index) => (
-            <div
-              key={property.id}
-              className="animate-slide-up"
-              style={{ animationDelay: `${index * 0.2}s` }}
-            >
-              <PropertyCard {...property} />
-            </div>
-          ))}
-        </div>
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <Card key={i} className="property-card animate-pulse">
+                <div className="h-64 bg-muted"></div>
+                <CardContent className="p-6">
+                  <div className="h-6 bg-muted rounded mb-2"></div>
+                  <div className="h-4 bg-muted rounded mb-4 w-3/4"></div>
+                  <div className="flex justify-between mb-4">
+                    <div className="h-4 bg-muted rounded w-16"></div>
+                    <div className="h-4 bg-muted rounded w-16"></div>
+                    <div className="h-4 bg-muted rounded w-16"></div>
+                  </div>
+                  <div className="h-10 bg-muted rounded"></div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+            {properties.map((property, index) => (
+              <div
+                key={property.id}
+                className="animate-slide-up"
+                style={{ animationDelay: `${index * 0.2}s` }}
+              >
+                <PropertyCard 
+                  id={property.id}
+                  title={property.title}
+                  location={property.location}
+                  price={`Rs. ${(property.price / 10000000).toFixed(1)} Cr`}
+                  image={property.images[0] || 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800'}
+                  bedrooms={property.bedrooms}
+                  bathrooms={property.bathrooms}
+                  area={property.area_sqft ? `${property.area_sqft} sq ft` : undefined}
+                  type="sale"
+                  featured={property.is_featured}
+                  discount={property.discount_percentage > 0 ? `${property.discount_percentage}% Off` : undefined}
+                />
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* View All Button */}
         <div className="text-center animate-fade-in">

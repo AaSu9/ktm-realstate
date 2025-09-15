@@ -14,7 +14,125 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      inquiries: {
+        Row: {
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          inquiry_type: string | null
+          message: string | null
+          phone: string
+          property_id: string | null
+          property_interest: string | null
+          status: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          inquiry_type?: string | null
+          message?: string | null
+          phone: string
+          property_id?: string | null
+          property_interest?: string | null
+          status?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          inquiry_type?: string | null
+          message?: string | null
+          phone?: string
+          property_id?: string | null
+          property_interest?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inquiries_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      properties: {
+        Row: {
+          area_sqft: number | null
+          bathrooms: number | null
+          bedrooms: number | null
+          category: string
+          created_at: string
+          description: string | null
+          discount_percentage: number | null
+          features: string[] | null
+          id: string
+          images: string[] | null
+          is_featured: boolean | null
+          is_hot_deal: boolean | null
+          latitude: number | null
+          location: string
+          longitude: number | null
+          price: number
+          property_type: string
+          status: string | null
+          title: string
+          updated_at: string
+          video_url: string | null
+        }
+        Insert: {
+          area_sqft?: number | null
+          bathrooms?: number | null
+          bedrooms?: number | null
+          category: string
+          created_at?: string
+          description?: string | null
+          discount_percentage?: number | null
+          features?: string[] | null
+          id?: string
+          images?: string[] | null
+          is_featured?: boolean | null
+          is_hot_deal?: boolean | null
+          latitude?: number | null
+          location: string
+          longitude?: number | null
+          price: number
+          property_type: string
+          status?: string | null
+          title: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Update: {
+          area_sqft?: number | null
+          bathrooms?: number | null
+          bedrooms?: number | null
+          category?: string
+          created_at?: string
+          description?: string | null
+          discount_percentage?: number | null
+          features?: string[] | null
+          id?: string
+          images?: string[] | null
+          is_featured?: boolean | null
+          is_hot_deal?: boolean | null
+          latitude?: number | null
+          location?: string
+          longitude?: number | null
+          price?: number
+          property_type?: string
+          status?: string | null
+          title?: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

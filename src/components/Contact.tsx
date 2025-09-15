@@ -2,6 +2,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { useState } from 'react';
 import { 
   Phone, 
   MessageCircle, 
@@ -15,12 +18,67 @@ import {
 } from 'lucide-react';
 
 const Contact = () => {
+  const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    fullName: '',
+    phone: '',
+    email: '',
+    propertyInterest: '',
+    message: ''
+  });
+
   const handleWhatsApp = () => {
     window.open('https://wa.me/9779841234567', '_blank');
   };
 
   const handleCall = () => {
     window.location.href = 'tel:+9779841234567';
+  };
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      const { error } = await supabase
+        .from('inquiries')
+        .insert([{
+          full_name: formData.fullName,
+          phone: formData.phone,
+          email: formData.email,
+          property_interest: formData.propertyInterest,
+          message: formData.message,
+          inquiry_type: 'contact_form'
+        }]);
+
+      if (error) throw error;
+
+      toast({
+        title: "Message Sent Successfully!",
+        description: "We'll get back to you within 2 hours.",
+      });
+
+      setFormData({
+        fullName: '',
+        phone: '',
+        email: '',
+        propertyInterest: '',
+        message: ''
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to send message. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const contactInfo = [
@@ -78,19 +136,31 @@ const Contact = () => {
                   Send us a Message
                 </h3>
                 
-                <form className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-foreground mb-2">
                         Full Name
                       </label>
-                      <Input placeholder="John Doe" className="h-12" />
+                      <Input 
+                        placeholder="John Doe" 
+                        className="h-12"
+                        value={formData.fullName}
+                        onChange={(e) => handleInputChange('fullName', e.target.value)}
+                        required
+                      />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-foreground mb-2">
                         Phone Number
                       </label>
-                      <Input placeholder="+977 98XXXXXXXX" className="h-12" />
+                      <Input 
+                        placeholder="+977 98XXXXXXXX" 
+                        className="h-12"
+                        value={formData.phone}
+                        onChange={(e) => handleInputChange('phone', e.target.value)}
+                        required
+                      />
                     </div>
                   </div>
                   
@@ -98,14 +168,26 @@ const Contact = () => {
                     <label className="block text-sm font-medium text-foreground mb-2">
                       Email Address
                     </label>
-                    <Input type="email" placeholder="john@example.com" className="h-12" />
+                    <Input 
+                      type="email" 
+                      placeholder="john@example.com" 
+                      className="h-12"
+                      value={formData.email}
+                      onChange={(e) => handleInputChange('email', e.target.value)}
+                      required
+                    />
                   </div>
                   
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-2">
                       Property Interest
                     </label>
-                    <Input placeholder="e.g., 3 BHK Apartment in Kathmandu" className="h-12" />
+                    <Input 
+                      placeholder="e.g., 3 BHK Apartment in Kathmandu" 
+                      className="h-12"
+                      value={formData.propertyInterest}
+                      onChange={(e) => handleInputChange('propertyInterest', e.target.value)}
+                    />
                   </div>
                   
                   <div>
@@ -115,12 +197,18 @@ const Contact = () => {
                     <Textarea 
                       placeholder="Tell us about your requirements..."
                       className="min-h-[120px] resize-none"
+                      value={formData.message}
+                      onChange={(e) => handleInputChange('message', e.target.value)}
                     />
                   </div>
                   
-                  <Button className="btn-hero w-full h-12">
+                  <Button 
+                    type="submit" 
+                    className="btn-hero w-full h-12" 
+                    disabled={isSubmitting}
+                  >
                     <Send className="h-5 w-5 mr-2" />
-                    Send Message
+                    {isSubmitting ? 'Sending...' : 'Send Message'}
                   </Button>
                 </form>
               </CardContent>
