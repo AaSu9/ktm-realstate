@@ -1,0 +1,233 @@
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent } from '@/components/ui/card';
+import { 
+  Phone, 
+  MessageCircle, 
+  Mail, 
+  MapPin, 
+  Clock, 
+  Send,
+  Facebook,
+  Instagram,
+  Youtube
+} from 'lucide-react';
+
+const Contact = () => {
+  const handleWhatsApp = () => {
+    window.open('https://wa.me/9779841234567', '_blank');
+  };
+
+  const handleCall = () => {
+    window.location.href = 'tel:+9779841234567';
+  };
+
+  const contactInfo = [
+    {
+      icon: Phone,
+      title: 'Call Us',
+      details: '+977 9841-234567',
+      subtitle: 'Mon-Sun: 7:00 AM - 8:00 PM',
+      action: handleCall
+    },
+    {
+      icon: MessageCircle,
+      title: 'WhatsApp',
+      details: '+977 9841-234567',
+      subtitle: 'Quick response guaranteed',
+      action: handleWhatsApp
+    },
+    {
+      icon: Mail,
+      title: 'Email',
+      details: 'info@ktmrealstate.com',
+      subtitle: 'We reply within 2 hours',
+      action: () => window.location.href = 'mailto:info@ktmrealstate.com'
+    },
+    {
+      icon: MapPin,
+      title: 'Office',
+      details: 'New Baneshwor, Kathmandu',
+      subtitle: 'Visit us for consultation',
+      action: () => window.open('https://maps.google.com', '_blank')
+    }
+  ];
+
+  return (
+    <section id="contact" className="py-20 bg-muted/30">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Section Header */}
+        <div className="text-center mb-16">
+          <div className="animate-fade-in">
+            <h2 className="text-4xl font-bold text-foreground mb-4">
+              Get In Touch
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              Ready to find your dream property? Contact our expert team today. We're here to help you every step of the way.
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          {/* Contact Form */}
+          <div className="animate-slide-up">
+            <Card className="property-card">
+              <CardContent className="p-8">
+                <h3 className="text-2xl font-semibold text-foreground mb-6">
+                  Send us a Message
+                </h3>
+                
+                <form className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-foreground mb-2">
+                        Full Name
+                      </label>
+                      <Input placeholder="John Doe" className="h-12" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-foreground mb-2">
+                        Phone Number
+                      </label>
+                      <Input placeholder="+977 98XXXXXXXX" className="h-12" />
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-foreground mb-2">
+                      Email Address
+                    </label>
+                    <Input type="email" placeholder="john@example.com" className="h-12" />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-foreground mb-2">
+                      Property Interest
+                    </label>
+                    <Input placeholder="e.g., 3 BHK Apartment in Kathmandu" className="h-12" />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-foreground mb-2">
+                      Message
+                    </label>
+                    <Textarea 
+                      placeholder="Tell us about your requirements..."
+                      className="min-h-[120px] resize-none"
+                    />
+                  </div>
+                  
+                  <Button className="btn-hero w-full h-12">
+                    <Send className="h-5 w-5 mr-2" />
+                    Send Message
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Contact Information */}
+          <div className="space-y-6">
+            {contactInfo.map((info, index) => (
+              <Card
+                key={info.title}
+                className="property-card cursor-pointer animate-slide-up"
+                style={{ animationDelay: `${index * 0.1}s` }}
+                onClick={info.action}
+              >
+                <CardContent className="p-6">
+                  <div className="flex items-start space-x-4">
+                    <div className="w-12 h-12 bg-accent/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <info.icon className="h-6 w-6 text-accent" />
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="text-lg font-semibold text-foreground mb-1">
+                        {info.title}
+                      </h4>
+                      <p className="text-accent font-medium mb-1">
+                        {info.details}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {info.subtitle}
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+
+            {/* Quick Actions */}
+            <div className="grid grid-cols-2 gap-4 mt-8">
+              <Button 
+                className="btn-primary h-14 text-lg"
+                onClick={handleCall}
+              >
+                <Phone className="h-5 w-5 mr-2" />
+                Call Now
+              </Button>
+              <Button 
+                className="h-14 text-lg bg-green-600 hover:bg-green-700"
+                onClick={handleWhatsApp}
+              >
+                <MessageCircle className="h-5 w-5 mr-2" />
+                WhatsApp
+              </Button>
+            </div>
+
+            {/* Social Media */}
+            <Card className="property-card mt-6">
+              <CardContent className="p-6">
+                <h4 className="text-lg font-semibold text-foreground mb-4">
+                  Follow Us
+                </h4>
+                <div className="flex space-x-4">
+                  <Button variant="outline" size="sm" className="flex-1">
+                    <Facebook className="h-4 w-4 mr-2" />
+                    Facebook
+                  </Button>
+                  <Button variant="outline" size="sm" className="flex-1">
+                    <Instagram className="h-4 w-4 mr-2" />
+                    Instagram
+                  </Button>
+                  <Button variant="outline" size="sm" className="flex-1">
+                    <Youtube className="h-4 w-4 mr-2" />
+                    YouTube
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Office Hours */}
+            <Card className="property-card">
+              <CardContent className="p-6">
+                <div className="flex items-center space-x-3 mb-4">
+                  <Clock className="h-6 w-6 text-accent" />
+                  <h4 className="text-lg font-semibold text-foreground">
+                    Office Hours
+                  </h4>
+                </div>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Monday - Friday:</span>
+                    <span className="text-foreground font-medium">9:00 AM - 7:00 PM</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Saturday:</span>
+                    <span className="text-foreground font-medium">9:00 AM - 5:00 PM</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Sunday:</span>
+                    <span className="text-foreground font-medium">10:00 AM - 4:00 PM</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default Contact;
