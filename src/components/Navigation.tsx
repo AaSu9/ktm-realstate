@@ -41,11 +41,19 @@ const Navigation = () => {
 
           {/* Contact Buttons */}
           <div className="hidden md:flex items-center space-x-4">
-            <Button variant="outline" size="sm" className="flex items-center gap-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="flex items-center gap-2"
+              onClick={() => window.location.href = 'tel:+9779741690374'}
+            >
               <Phone className="h-4 w-4" />
               Call Us
             </Button>
-            <Button className="btn-primary flex items-center gap-2">
+            <Button 
+              className="btn-primary flex items-center gap-2"
+              onClick={() => window.open('https://wa.me/9779741690374', '_blank')}
+            >
               <MessageCircle className="h-4 w-4" />
               WhatsApp
             </Button>
@@ -80,11 +88,19 @@ const Navigation = () => {
             ))}
             <div className="pt-4 pb-3 border-t border-border">
               <div className="flex flex-col space-y-2 px-3">
-                <Button variant="outline" size="sm" className="flex items-center gap-2 justify-center">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="flex items-center gap-2 justify-center"
+                  onClick={() => window.location.href = 'tel:+9779741690374'}
+                >
                   <Phone className="h-4 w-4" />
                   Call Us
                 </Button>
-                <Button className="btn-primary flex items-center gap-2 justify-center">
+                <Button 
+                  className="btn-primary flex items-center gap-2 justify-center"
+                  onClick={() => window.open('https://wa.me/9779741690374', '_blank')}
+                >
                   <MessageCircle className="h-4 w-4" />
                   WhatsApp
                 </Button>

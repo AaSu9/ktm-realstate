@@ -1,0 +1,20 @@
+{
+  "name": "KTM Realstate - Premium Properties in Nepal",
+  "short_name": "KTM Realstate",
+  "description": "Find your dream property in Nepal with KTM Realstate. Premium houses, apartments, and land for sale.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1a73e8",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
+    }
+  ],
+  "categories": ["business", "real-estate", "shopping"],
+  "scope": "/",
+  "lang": "en"
+}

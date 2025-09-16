@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import Newsletter from '@/components/Newsletter';
 import { 
   Phone, 
   Mail, 
@@ -7,8 +7,7 @@ import {
   Facebook, 
   Instagram, 
   Youtube,
-  MessageCircle,
-  Send
+  MessageCircle
 } from 'lucide-react';
 
 const Footer = () => {
@@ -55,11 +54,15 @@ const Footer = () => {
             <div className="space-y-3">
               <div className="flex items-center">
                 <Phone className="h-5 w-5 text-accent mr-3" />
-                <span>+977 9841-234567</span>
+                <a href="tel:+9779741690374" className="hover:text-accent transition-colors">
+                  +977 974-1690374
+                </a>
               </div>
               <div className="flex items-center">
                 <Mail className="h-5 w-5 text-accent mr-3" />
-                <span>info@ktmrealstate.com</span>
+                <a href="mailto:sumanghimire138@gmail.com" className="hover:text-accent transition-colors">
+                  sumanghimire138@gmail.com
+                </a>
               </div>
               <div className="flex items-center">
                 <MapPin className="h-5 w-5 text-accent mr-3" />
@@ -68,16 +71,36 @@ const Footer = () => {
             </div>
 
             <div className="flex space-x-3 mt-6">
-              <Button variant="outline" size="sm" className="border-accent text-accent hover:bg-accent hover:text-accent-foreground">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="border-accent text-accent hover:bg-accent hover:text-accent-foreground"
+                onClick={() => window.open('https://facebook.com', '_blank')}
+              >
                 <Facebook className="h-4 w-4" />
               </Button>
-              <Button variant="outline" size="sm" className="border-accent text-accent hover:bg-accent hover:text-accent-foreground">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="border-accent text-accent hover:bg-accent hover:text-accent-foreground"
+                onClick={() => window.open('https://instagram.com', '_blank')}
+              >
                 <Instagram className="h-4 w-4" />
               </Button>
-              <Button variant="outline" size="sm" className="border-accent text-accent hover:bg-accent hover:text-accent-foreground">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="border-accent text-accent hover:bg-accent hover:text-accent-foreground"
+                onClick={() => window.open('https://youtube.com', '_blank')}
+              >
                 <Youtube className="h-4 w-4" />
               </Button>
-              <Button variant="outline" size="sm" className="border-green-500 text-green-500 hover:bg-green-500 hover:text-white">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="border-green-500 text-green-500 hover:bg-green-500 hover:text-white"
+                onClick={() => window.open('https://wa.me/9779741690374', '_blank')}
+              >
                 <MessageCircle className="h-4 w-4" />
               </Button>
             </div>
@@ -124,16 +147,7 @@ const Footer = () => {
               Subscribe to get the latest property listings and market updates.
             </p>
             
-            <div className="space-y-3">
-              <Input 
-                placeholder="Enter your email"
-                className="bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/60"
-              />
-              <Button className="btn-hero w-full">
-                <Send className="h-4 w-4 mr-2" />
-                Subscribe
-              </Button>
-            </div>
+            <Newsletter />
 
             <div className="mt-6">
               <h5 className="font-medium mb-3">Popular Locations</h5>
@@ -142,6 +156,7 @@ const Footer = () => {
                   <span 
                     key={location}
                     className="px-2 py-1 bg-primary-foreground/10 rounded text-xs text-primary-foreground/80 hover:bg-accent hover:text-accent-foreground cursor-pointer transition-colors"
+                    onClick={() => window.open(`https://www.google.com/maps/search/properties+in+${location}+Nepal`, '_blank')}
                   >
                     {location}
                   </span>

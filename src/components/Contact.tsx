@@ -29,11 +29,11 @@ const Contact = () => {
   });
 
   const handleWhatsApp = () => {
-    window.open('https://wa.me/9779841234567', '_blank');
+    window.open('https://wa.me/9779741690374', '_blank');
   };
 
   const handleCall = () => {
-    window.location.href = 'tel:+9779841234567';
+    window.location.href = 'tel:+9779741690374';
   };
 
   const handleInputChange = (field: string, value: string) => {
@@ -85,23 +85,23 @@ const Contact = () => {
     {
       icon: Phone,
       title: 'Call Us',
-      details: '+977 9841-234567',
+      details: '+977 974-1690374',
       subtitle: 'Mon-Sun: 7:00 AM - 8:00 PM',
       action: handleCall
     },
     {
       icon: MessageCircle,
       title: 'WhatsApp',
-      details: '+977 9841-234567',
+      details: '+977 974-1690374',
       subtitle: 'Quick response guaranteed',
       action: handleWhatsApp
     },
     {
       icon: Mail,
       title: 'Email',
-      details: 'info@ktmrealstate.com',
+      details: 'sumanghimire138@gmail.com',
       subtitle: 'We reply within 2 hours',
-      action: () => window.location.href = 'mailto:info@ktmrealstate.com'
+      action: () => window.location.href = 'mailto:sumanghimire138@gmail.com'
     },
     {
       icon: MapPin,
