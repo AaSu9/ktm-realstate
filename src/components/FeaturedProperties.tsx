@@ -107,7 +107,10 @@ const FeaturedProperties = () => {
 
         {/* View All Button */}
         <div className="text-center animate-fade-in">
-          <Button className="btn-hero">
+          <Button 
+            className="btn-hero"
+            onClick={() => window.location.href = '#contact'}
+          >
             View All Properties
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>

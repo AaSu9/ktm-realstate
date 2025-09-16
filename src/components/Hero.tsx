@@ -1,34 +1,8 @@
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search, MapPin, Home, DollarSign } from 'lucide-react';
-import { useState } from 'react';
-import { useToast } from '@/hooks/use-toast';
+import PropertySearch from '@/components/PropertySearch';
 import heroImage from '@/assets/hero-property.jpg';
 
 const Hero = () => {
-  const { toast } = useToast();
-  const [searchData, setSearchData] = useState({
-    location: '',
-    propertyType: '',
-    budget: ''
-  });
-
-  const handleSearch = () => {
-    if (!searchData.location.trim()) {
-      toast({
-        title: "Please enter a location",
-        description: "Location is required to search properties.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    toast({
-      title: "Search functionality coming soon!",
-      description: `Searching for ${searchData.propertyType || 'properties'} in ${searchData.location}`,
-    });
-  };
   return (
     <section id="home" className="relative min-h-screen flex items-center justify-center">
       {/* Background Image */}
@@ -55,57 +29,7 @@ const Hero = () => {
           </div>
 
           {/* Search Form */}
-          <div className="animate-slide-up bg-white/95 backdrop-blur-md rounded-2xl p-6 shadow-luxury">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className="md:col-span-2">
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5" />
-                  <Input
-                    placeholder="Enter location (e.g., Kathmandu, Pokhara)"
-                    className="pl-10 h-12 border-border/20"
-                    value={searchData.location}
-                    onChange={(e) => setSearchData(prev => ({ ...prev, location: e.target.value }))}
-                  />
-                </div>
-              </div>
-              
-              <Select onValueChange={(value) => setSearchData(prev => ({ ...prev, propertyType: value }))}>
-                <SelectTrigger className="h-12">
-                  <Home className="h-4 w-4 mr-2" />
-                  <SelectValue placeholder="Property Type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="house">House</SelectItem>
-                  <SelectItem value="apartment">Apartment</SelectItem>
-                  <SelectItem value="land">Land</SelectItem>
-                  <SelectItem value="commercial">Commercial</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Select onValueChange={(value) => setSearchData(prev => ({ ...prev, budget: value }))}>
-                <SelectTrigger className="h-12">
-                  <DollarSign className="h-4 w-4 mr-2" />
-                  <SelectValue placeholder="Budget" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="0-50">Under Rs. 50 Lakh</SelectItem>
-                  <SelectItem value="50-100">Rs. 50L - 1 Crore</SelectItem>
-                  <SelectItem value="100-200">Rs. 1-2 Crore</SelectItem>
-                  <SelectItem value="200+">Above Rs. 2 Crore</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="mt-6 flex flex-col sm:flex-row gap-4">
-              <Button className="btn-hero flex-1 h-12" onClick={handleSearch}>
-                <Search className="h-5 w-5 mr-2" />
-                Search Properties
-              </Button>
-              <Button variant="outline" className="h-12 px-8">
-                Advanced Filters
-              </Button>
-            </div>
-          </div>
+          <PropertySearch className="animate-slide-up" />
 
           {/* Stats */}
           <div className="mt-12 animate-scale-in">

@@ -96,7 +96,11 @@ const Services = () => {
                   ))}
                 </ul>
 
-                <Button variant="outline" className="w-full group-hover:bg-accent group-hover:text-accent-foreground transition-colors">
+                <Button 
+                  variant="outline" 
+                  className="w-full group-hover:bg-accent group-hover:text-accent-foreground transition-colors"
+                  onClick={() => window.location.href = '#contact'}
+                >
                   Learn More
                 </Button>
               </CardContent>

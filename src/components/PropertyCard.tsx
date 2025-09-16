@@ -2,6 +2,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Bed, Bath, Square, Phone, MessageCircle, Heart } from 'lucide-react';
 import { useState } from 'react';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface PropertyCardProps {
   id: string;
@@ -18,6 +20,7 @@ interface PropertyCardProps {
 }
 
 const PropertyCard = ({ 
+  id,
   title, 
   location, 
   price, 
@@ -30,6 +33,48 @@ const PropertyCard = ({
   discount 
 }: PropertyCardProps) => {
   const [isLiked, setIsLiked] = useState(false);
+  const { toast } = useToast();
+
+  const handleInquiry = async (inquiryType: 'phone' | 'whatsapp' | 'details') => {
+    if (inquiryType === 'phone') {
+      window.location.href = 'tel:+9779741690374';
+      return;
+    }
+    
+    if (inquiryType === 'whatsapp') {
+      const message = `Hi! I'm interested in the property: ${title} located at ${location}. Price: ${price}. Can you provide more details?`;
+      window.open(`https://wa.me/9779741690374?text=${encodeURIComponent(message)}`, '_blank');
+      return;
+    }
+
+    // For view details, create an inquiry record
+    try {
+      const { error } = await supabase
+        .from('inquiries')
+        .insert([{
+          full_name: 'Website Visitor',
+          phone: '',
+          email: '',
+          property_interest: `${title} - ${location}`,
+          message: `Interested in viewing details for property: ${title}`,
+          inquiry_type: 'property_inquiry',
+          property_id: id
+        }]);
+
+      if (error) throw error;
+
+      toast({
+        title: "Interest Recorded!",
+        description: "We'll contact you soon with detailed information about this property.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Please call us directly for property details.",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <div className="property-card overflow-hidden group">
@@ -109,13 +154,25 @@ const PropertyCard = ({
 
         {/* Action Buttons */}
         <div className="flex gap-2">
-          <Button variant="outline" className="flex-1 text-sm">
+          <Button 
+            variant="outline" 
+            className="flex-1 text-sm"
+            onClick={() => handleInquiry('details')}
+          >
             View Details
           </Button>
-          <Button size="sm" className="px-3">
+          <Button 
+            size="sm" 
+            className="px-3"
+            onClick={() => handleInquiry('phone')}
+          >
             <Phone className="h-4 w-4" />
           </Button>
-          <Button size="sm" className="px-3 bg-green-600 hover:bg-green-700">
+          <Button 
+            size="sm" 
+            className="px-3 bg-green-600 hover:bg-green-700"
+            onClick={() => handleInquiry('whatsapp')}
+          >
             <MessageCircle className="h-4 w-4" />
           </Button>
         </div>

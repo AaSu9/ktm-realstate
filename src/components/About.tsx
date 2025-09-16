@@ -95,7 +95,10 @@ const About = () => {
                 Our deep understanding of local markets, combined with modern technology and personalized service, sets us apart in the Nepal real estate landscape.
               </p>
             </div>
-            <Button className="btn-hero mt-6">
+            <Button 
+              className="btn-hero mt-6"
+              onClick={() => window.location.href = '#contact'}
+            >
               Learn More About Us
             </Button>
           </div>
@@ -206,10 +209,17 @@ const About = () => {
             Join thousands of satisfied clients who have found their perfect properties with KTM Realstate.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button className="btn-hero">
+            <Button 
+              className="btn-hero"
+              onClick={() => window.location.href = '#properties'}
+            >
               View Properties
             </Button>
-            <Button variant="outline" className="border-accent text-accent hover:bg-accent hover:text-accent-foreground">
+            <Button 
+              variant="outline" 
+              className="border-accent text-accent hover:bg-accent hover:text-accent-foreground"
+              onClick={() => window.location.href = '#contact'}
+            >
               Contact Us Today
             </Button>
           </div>

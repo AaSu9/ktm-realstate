@@ -6,6 +6,7 @@ import About from '@/components/About';
 import Maps from '@/components/Maps';
 import Contact from '@/components/Contact';
 import Footer from '@/components/Footer';
+import QuickActions from '@/components/QuickActions';
 
 const Index = () => {
   return (
@@ -20,6 +21,7 @@ const Index = () => {
         <Contact />
       </main>
       <Footer />
+      <QuickActions />
     </div>
   );
 };
