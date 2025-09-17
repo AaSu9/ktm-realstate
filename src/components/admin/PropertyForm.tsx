@@ -1,0 +1,408 @@
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { Badge } from '@/components/ui/badge';
+import { X, Plus } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+
+interface Property {
+  id?: string;
+  title: string;
+  location: string;
+  price: number;
+  images: string[];
+  bedrooms?: number;
+  bathrooms?: number;
+  area_sqft?: number;
+  property_type: string;
+  status: string;
+  is_featured: boolean;
+  is_hot_deal: boolean;
+  discount_percentage: number;
+  description?: string;
+  features?: string[];
+  category: string;
+}
+
+interface PropertyFormProps {
+  property?: Property | null;
+  onSubmit: () => void;
+  onCancel: () => void;
+}
+
+const PropertyForm = ({ property, onSubmit, onCancel }: PropertyFormProps) => {
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
+  const [newImage, setNewImage] = useState('');
+  const [newFeature, setNewFeature] = useState('');
+  
+  const [formData, setFormData] = useState<Property>({
+    title: property?.title || '',
+    location: property?.location || '',
+    price: property?.price || 0,
+    images: property?.images || [],
+    bedrooms: property?.bedrooms || undefined,
+    bathrooms: property?.bathrooms || undefined,
+    area_sqft: property?.area_sqft || undefined,
+    property_type: property?.property_type || 'apartment',
+    status: property?.status || 'available',
+    is_featured: property?.is_featured || false,
+    is_hot_deal: property?.is_hot_deal || false,
+    discount_percentage: property?.discount_percentage || 0,
+    description: property?.description || '',
+    features: property?.features || [],
+    category: property?.category || 'sale',
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.title || !formData.location || !formData.price) {
+      toast({
+        title: "Error",
+        description: "Please fill in all required fields",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      if (property?.id) {
+        // Update existing property
+        const { error } = await supabase
+          .from('properties')
+          .update(formData)
+          .eq('id', property.id);
+
+        if (error) throw error;
+        toast({
+          title: "Success",
+          description: "Property updated successfully",
+        });
+      } else {
+        // Create new property
+        const { error } = await supabase
+          .from('properties')
+          .insert([formData]);
+
+        if (error) throw error;
+        toast({
+          title: "Success",
+          description: "Property created successfully",
+        });
+      }
+
+      onSubmit();
+    } catch (error) {
+      console.error('Error saving property:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save property",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const addImage = () => {
+    if (newImage && !formData.images.includes(newImage)) {
+      setFormData(prev => ({
+        ...prev,
+        images: [...prev.images, newImage]
+      }));
+      setNewImage('');
+    }
+  };
+
+  const removeImage = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index)
+    }));
+  };
+
+  const addFeature = () => {
+    if (newFeature && !formData.features?.includes(newFeature)) {
+      setFormData(prev => ({
+        ...prev,
+        features: [...(prev.features || []), newFeature]
+      }));
+      setNewFeature('');
+    }
+  };
+
+  const removeFeature = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      features: prev.features?.filter((_, i) => i !== index) || []
+    }));
+  };
+
+  return (
+    <Card className="max-w-4xl mx-auto">
+      <CardHeader>
+        <CardTitle>
+          {property ? 'Edit Property' : 'Add New Property'}
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label htmlFor="title">Title *</Label>
+              <Input
+                id="title"
+                value={formData.title}
+                onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                placeholder="Property title"
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="location">Location *</Label>
+              <Input
+                id="location"
+                value={formData.location}
+                onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
+                placeholder="Property location"
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="price">Price *</Label>
+              <Input
+                id="price"
+                type="number"
+                value={formData.price}
+                onChange={(e) => setFormData(prev => ({ ...prev, price: Number(e.target.value) }))}
+                placeholder="Price in NPR"
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="property_type">Property Type</Label>
+              <Select
+                value={formData.property_type}
+                onValueChange={(value) => setFormData(prev => ({ ...prev, property_type: value }))}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="apartment">Apartment</SelectItem>
+                  <SelectItem value="house">House</SelectItem>
+                  <SelectItem value="land">Land</SelectItem>
+                  <SelectItem value="commercial">Commercial</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="category">Category</Label>
+              <Select
+                value={formData.category}
+                onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="sale">Sale</SelectItem>
+                  <SelectItem value="rent">Rent</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="status">Status</Label>
+              <Select
+                value={formData.status}
+                onValueChange={(value) => setFormData(prev => ({ ...prev, status: value }))}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="available">Available</SelectItem>
+                  <SelectItem value="sold">Sold</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="bedrooms">Bedrooms</Label>
+              <Input
+                id="bedrooms"
+                type="number"
+                value={formData.bedrooms || ''}
+                onChange={(e) => setFormData(prev => ({ 
+                  ...prev, 
+                  bedrooms: e.target.value ? Number(e.target.value) : undefined 
+                }))}
+                placeholder="Number of bedrooms"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="bathrooms">Bathrooms</Label>
+              <Input
+                id="bathrooms"
+                type="number"
+                value={formData.bathrooms || ''}
+                onChange={(e) => setFormData(prev => ({ 
+                  ...prev, 
+                  bathrooms: e.target.value ? Number(e.target.value) : undefined 
+                }))}
+                placeholder="Number of bathrooms"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="area_sqft">Area (sq ft)</Label>
+              <Input
+                id="area_sqft"
+                type="number"
+                value={formData.area_sqft || ''}
+                onChange={(e) => setFormData(prev => ({ 
+                  ...prev, 
+                  area_sqft: e.target.value ? Number(e.target.value) : undefined 
+                }))}
+                placeholder="Area in square feet"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="discount">Discount %</Label>
+              <Input
+                id="discount"
+                type="number"
+                min="0"
+                max="100"
+                value={formData.discount_percentage}
+                onChange={(e) => setFormData(prev => ({ 
+                  ...prev, 
+                  discount_percentage: Number(e.target.value) 
+                }))}
+                placeholder="Discount percentage"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="description">Description</Label>
+            <Textarea
+              id="description"
+              value={formData.description}
+              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+              placeholder="Property description"
+              rows={4}
+            />
+          </div>
+
+          <div className="space-y-4">
+            <Label>Images</Label>
+            <div className="flex gap-2">
+              <Input
+                value={newImage}
+                onChange={(e) => setNewImage(e.target.value)}
+                placeholder="Image URL"
+              />
+              <Button type="button" onClick={addImage}>
+                <Plus className="h-4 w-4" />
+              </Button>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {formData.images.map((image, index) => (
+                <Badge key={index} variant="secondary" className="pr-1">
+                  <img src={image} alt="" className="w-8 h-8 object-cover rounded mr-2" />
+                  Image {index + 1}
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => removeImage(index)}
+                    className="ml-1 h-auto p-0"
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                </Badge>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <Label>Features</Label>
+            <div className="flex gap-2">
+              <Input
+                value={newFeature}
+                onChange={(e) => setNewFeature(e.target.value)}
+                placeholder="Add feature"
+              />
+              <Button type="button" onClick={addFeature}>
+                <Plus className="h-4 w-4" />
+              </Button>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {formData.features?.map((feature, index) => (
+                <Badge key={index} variant="secondary" className="pr-1">
+                  {feature}
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => removeFeature(index)}
+                    className="ml-1 h-auto p-0"
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                </Badge>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex gap-6">
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="featured"
+                checked={formData.is_featured}
+                onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_featured: checked }))}
+              />
+              <Label htmlFor="featured">Featured Property</Label>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="hot_deal"
+                checked={formData.is_hot_deal}
+                onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_hot_deal: checked }))}
+              />
+              <Label htmlFor="hot_deal">Hot Deal</Label>
+            </div>
+          </div>
+
+          <div className="flex gap-4">
+            <Button type="submit" disabled={loading}>
+              {loading ? 'Saving...' : property ? 'Update Property' : 'Create Property'}
+            </Button>
+            <Button type="button" variant="outline" onClick={onCancel}>
+              Cancel
+            </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
+  );
+};
+
+export default PropertyForm;

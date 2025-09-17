@@ -182,6 +182,9 @@ const Footer = () => {
               <a href="#" className="text-primary-foreground/80 hover:text-accent transition-colors">
                 Cookie Policy
               </a>
+              <a href="/admin" className="text-primary-foreground/60 hover:text-accent transition-colors text-xs">
+                Admin
+              </a>
             </div>
           </div>
         </div>
