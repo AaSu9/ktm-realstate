@@ -28,6 +28,9 @@ interface Property {
   description?: string;
   features?: string[];
   category: string;
+  video_url?: string;
+  youtube_url?: string;
+  tiktok_url?: string;
 }
 
 interface PropertyFormProps {
@@ -58,6 +61,9 @@ const PropertyForm = ({ property, onSubmit, onCancel }: PropertyFormProps) => {
     description: property?.description || '',
     features: property?.features || [],
     category: property?.category || 'sale',
+    video_url: property?.video_url || '',
+    youtube_url: property?.youtube_url || '',
+    tiktok_url: property?.tiktok_url || '',
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -295,6 +301,36 @@ const PropertyForm = ({ property, onSubmit, onCancel }: PropertyFormProps) => {
                   discount_percentage: Number(e.target.value) 
                 }))}
                 placeholder="Discount percentage"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="video_url">Video URL</Label>
+              <Input
+                id="video_url"
+                value={formData.video_url || ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, video_url: e.target.value }))}
+                placeholder="Property video URL"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="youtube_url">YouTube URL</Label>
+              <Input
+                id="youtube_url"
+                value={formData.youtube_url || ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, youtube_url: e.target.value }))}
+                placeholder="YouTube video URL"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="tiktok_url">TikTok URL</Label>
+              <Input
+                id="tiktok_url"
+                value={formData.tiktok_url || ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, tiktok_url: e.target.value }))}
+                placeholder="TikTok video URL"
               />
             </div>
           </div>

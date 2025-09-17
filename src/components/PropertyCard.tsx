@@ -1,9 +1,10 @@
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Bed, Bath, Square, Phone, MessageCircle, Heart } from 'lucide-react';
+import { MapPin, Bed, Bath, Square, Phone, MessageCircle, Heart, Eye } from 'lucide-react';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import PropertyDetailsModal from './PropertyDetailsModal';
 
 interface PropertyCardProps {
   id: string;
@@ -17,6 +18,7 @@ interface PropertyCardProps {
   type: 'sale' | 'rent';
   featured?: boolean;
   discount?: string;
+  property?: any; // Full property object for detailed view
 }
 
 const PropertyCard = ({ 
@@ -30,9 +32,11 @@ const PropertyCard = ({
   area, 
   type, 
   featured, 
-  discount 
+  discount,
+  property 
 }: PropertyCardProps) => {
   const [isLiked, setIsLiked] = useState(false);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
   const { toast } = useToast();
 
   const handleInquiry = async (inquiryType: 'phone' | 'whatsapp' | 'details') => {
@@ -47,32 +51,9 @@ const PropertyCard = ({
       return;
     }
 
-    // For view details, create an inquiry record
-    try {
-      const { error } = await supabase
-        .from('inquiries')
-        .insert([{
-          full_name: 'Website Visitor',
-          phone: '',
-          email: '',
-          property_interest: `${title} - ${location}`,
-          message: `Interested in viewing details for property: ${title}`,
-          inquiry_type: 'property_inquiry',
-          property_id: id
-        }]);
-
-      if (error) throw error;
-
-      toast({
-        title: "Interest Recorded!",
-        description: "We'll contact you soon with detailed information about this property.",
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Please call us directly for property details.",
-        variant: "destructive",
-      });
+    if (inquiryType === 'details') {
+      setShowDetailsModal(true);
+      return;
     }
   };
 
@@ -156,27 +137,35 @@ const PropertyCard = ({
         <div className="flex gap-2">
           <Button 
             variant="outline" 
-            className="flex-1 text-sm"
+            className="flex-1 text-sm hover:bg-accent hover:text-accent-foreground transition-colors"
             onClick={() => handleInquiry('details')}
           >
+            <Eye className="h-4 w-4 mr-1" />
             View Details
           </Button>
           <Button 
             size="sm" 
-            className="px-3"
+            className="px-3 hover:scale-105 transition-transform"
             onClick={() => handleInquiry('phone')}
           >
             <Phone className="h-4 w-4" />
           </Button>
           <Button 
             size="sm" 
-            className="px-3 bg-green-600 hover:bg-green-700"
+            className="px-3 bg-green-600 hover:bg-green-700 hover:scale-105 transition-all"
             onClick={() => handleInquiry('whatsapp')}
           >
             <MessageCircle className="h-4 w-4" />
           </Button>
         </div>
       </div>
+
+      {/* Property Details Modal */}
+      <PropertyDetailsModal
+        property={property}
+        isOpen={showDetailsModal}
+        onClose={() => setShowDetailsModal(false)}
+      />
     </div>
   );
 };

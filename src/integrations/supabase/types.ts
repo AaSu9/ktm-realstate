@@ -81,9 +81,11 @@ export type Database = {
           price: number
           property_type: string
           status: string | null
+          tiktok_url: string | null
           title: string
           updated_at: string
           video_url: string | null
+          youtube_url: string | null
         }
         Insert: {
           area_sqft?: number | null
@@ -104,9 +106,11 @@ export type Database = {
           price: number
           property_type: string
           status?: string | null
+          tiktok_url?: string | null
           title: string
           updated_at?: string
           video_url?: string | null
+          youtube_url?: string | null
         }
         Update: {
           area_sqft?: number | null
@@ -127,9 +131,11 @@ export type Database = {
           price?: number
           property_type?: string
           status?: string | null
+          tiktok_url?: string | null
           title?: string
           updated_at?: string
           video_url?: string | null
+          youtube_url?: string | null
         }
         Relationships: []
       }
