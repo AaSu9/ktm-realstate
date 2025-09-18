@@ -3,29 +3,74 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Phone, MessageCircle, Mail, MapPin } from 'lucide-react';
 
 const QuickActions = () => {
+  const handleCall = () => {
+    // For mobile devices, this will trigger the phone dialer
+    window.location.href = 'tel:+9779741690374';
+  };
+
+  const handleWhatsApp = () => {
+    // Enhanced WhatsApp with pre-filled message
+    const message = encodeURIComponent('Hi! I am interested in your real estate services. Can you help me find a property?');
+    const whatsappUrl = `https://wa.me/9779741690374?text=${message}`;
+    
+    // Check if it's a mobile device for better WhatsApp experience
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    if (isMobile) {
+      // Try to open WhatsApp app first, fallback to web
+      window.location.href = `whatsapp://send?phone=9779741690374&text=${message}`;
+      setTimeout(() => {
+        window.open(whatsappUrl, '_blank');
+      }, 500);
+    } else {
+      window.open(whatsappUrl, '_blank');
+    }
+  };
+
+  const handleEmail = () => {
+    const subject = encodeURIComponent('Real Estate Inquiry from Website');
+    const body = encodeURIComponent('Hi,\n\nI am interested in your real estate services. Please contact me to discuss my requirements.\n\nBest regards');
+    window.location.href = `mailto:sumanghimire138@gmail.com?subject=${subject}&body=${body}`;
+  };
+
+  const handleLocation = () => {
+    // Scroll to maps section first, then optionally open external map
+    const mapsSection = document.querySelector('#maps');
+    if (mapsSection) {
+      mapsSection.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+    // Optional: Also open in Google Maps
+    setTimeout(() => {
+      window.open('https://maps.google.com/?q=New+Baneshwor,Kathmandu,Nepal', '_blank');
+    }, 1000);
+  };
+
   const quickActions = [
     {
       icon: Phone,
       label: 'Call Now',
-      action: () => window.location.href = 'tel:+9779741690374',
+      action: handleCall,
       className: 'btn-primary'
     },
     {
       icon: MessageCircle,
       label: 'WhatsApp',
-      action: () => window.open('https://wa.me/9779741690374', '_blank'),
+      action: handleWhatsApp,
       className: 'bg-green-600 hover:bg-green-700 text-white'
     },
     {
       icon: Mail,
       label: 'Email Us',
-      action: () => window.location.href = 'mailto:sumanghimire138@gmail.com',
+      action: handleEmail,
       className: 'bg-blue-600 hover:bg-blue-700 text-white'
     },
     {
       icon: MapPin,
       label: 'Visit Office',
-      action: () => window.open('https://www.google.com/maps/place/New+Baneshwor,+Kathmandu,+Nepal', '_blank'),
+      action: handleLocation,
       className: 'bg-purple-600 hover:bg-purple-700 text-white'
     }
   ];

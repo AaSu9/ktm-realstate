@@ -3,7 +3,7 @@ import Hero from '@/components/Hero';
 import FeaturedProperties from '@/components/FeaturedProperties';
 import Services from '@/components/Services';
 import About from '@/components/About';
-import Maps from '@/components/Maps';
+import GoogleMaps from '@/components/GoogleMaps';
 import Contact from '@/components/Contact';
 import Footer from '@/components/Footer';
 import QuickActions from '@/components/QuickActions';
@@ -13,12 +13,24 @@ const Index = () => {
     <div className="min-h-screen">
       <Navigation />
       <main>
-        <Hero />
-        <FeaturedProperties />
-        <Services />
-        <About />
-        <Maps />
-        <Contact />
+        <section id="home">
+          <Hero />
+        </section>
+        <section id="properties">
+          <FeaturedProperties />
+        </section>
+        <section id="services">
+          <Services />
+        </section>
+        <section id="about">
+          <About />
+        </section>
+        <section id="maps">
+          <GoogleMaps />
+        </section>
+        <section id="contact">
+          <Contact />
+        </section>
       </main>
       <Footer />
       <QuickActions />

@@ -47,7 +47,7 @@ const FeaturedProperties = () => {
           query = query.eq('is_hot_deal', true);
         }
 
-        query = query.limit(12);
+        query = query.limit(20);
 
         const { data, error } = await query;
 
@@ -64,7 +64,7 @@ const FeaturedProperties = () => {
   }, [activeTab]);
 
   return (
-    <section id="properties" className="py-20 bg-gradient-to-br from-background to-muted/30">
+    <section className="py-20 bg-gradient-to-br from-background to-muted/30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-16">
