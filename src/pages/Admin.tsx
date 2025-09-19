@@ -8,7 +8,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import PropertyForm from '@/components/admin/PropertyForm';
 import PropertyList from '@/components/admin/PropertyList';
-import { Plus, Lock } from 'lucide-react';
+import InquiriesList from '@/components/admin/InquiriesList';
+import { Plus, Lock, MessageSquare, Users, BarChart3 } from 'lucide-react';
 
 interface Property {
   id: string;
@@ -194,8 +195,18 @@ const Admin = () => {
 
         <Tabs defaultValue="properties" className="space-y-6">
           <TabsList>
-            <TabsTrigger value="properties">Manage Properties</TabsTrigger>
-            <TabsTrigger value="stats">Statistics</TabsTrigger>
+            <TabsTrigger value="properties" className="flex items-center gap-2">
+              <Users className="h-4 w-4" />
+              Manage Properties
+            </TabsTrigger>
+            <TabsTrigger value="inquiries" className="flex items-center gap-2">
+              <MessageSquare className="h-4 w-4" />
+              Client Inquiries
+            </TabsTrigger>
+            <TabsTrigger value="stats" className="flex items-center gap-2">
+              <BarChart3 className="h-4 w-4" />
+              Statistics
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="properties">
@@ -221,6 +232,16 @@ const Admin = () => {
                 onDelete={handlePropertyDelete}
               />
             )}
+          </TabsContent>
+
+          <TabsContent value="inquiries">
+            <div className="space-y-6">
+              <div className="flex justify-between items-center">
+                <h2 className="text-2xl font-semibold">Client Inquiries</h2>
+                <Badge variant="secondary">{/* This could show unread count */}</Badge>
+              </div>
+              <InquiriesList loading={loading} />
+            </div>
           </TabsContent>
 
           <TabsContent value="stats">
