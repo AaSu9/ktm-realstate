@@ -1,29 +1,49 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Phone, MessageCircle, Mail, MapPin } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 const QuickActions = () => {
+  const { toast } = useToast();
+  
   const handleCall = () => {
     // For mobile devices, this will trigger the phone dialer
     window.location.href = 'tel:+9779741690374';
   };
 
-  const handleWhatsApp = () => {
-    // Enhanced WhatsApp with pre-filled message
-    const message = encodeURIComponent('Hi! I am interested in your real estate services. Can you help me find a property?');
-    const whatsappUrl = `https://wa.me/9779741690374?text=${message}`;
-    
-    // Check if it's a mobile device for better WhatsApp experience
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    
-    if (isMobile) {
-      // Try to open WhatsApp app first, fallback to web
-      window.location.href = `whatsapp://send?phone=9779741690374&text=${message}`;
-      setTimeout(() => {
+  const handleWhatsApp = async () => {
+    try {
+      // Send WhatsApp message via edge function
+      await supabase.functions.invoke('whatsapp-send', {
+        body: {
+          to: '9779741690374',
+          message: 'Hi! I am interested in your real estate services. Can you help me find a property?'
+        }
+      });
+      
+      toast({
+        title: "WhatsApp Message Sent!",
+        description: "We'll respond to you shortly.",
+      });
+    } catch (error) {
+      console.error('WhatsApp function failed, using fallback:', error);
+      // Fallback to opening WhatsApp Web
+      const message = encodeURIComponent('Hi! I am interested in your real estate services. Can you help me find a property?');
+      const whatsappUrl = `https://wa.me/9779741690374?text=${message}`;
+      
+      // Check if it's a mobile device for better WhatsApp experience
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      
+      if (isMobile) {
+        // Try to open WhatsApp app first, fallback to web
+        window.location.href = `whatsapp://send?phone=9779741690374&text=${message}`;
+        setTimeout(() => {
+          window.open(whatsappUrl, '_blank');
+        }, 500);
+      } else {
         window.open(whatsappUrl, '_blank');
-      }, 500);
-    } else {
-      window.open(whatsappUrl, '_blank');
+      }
     }
   };
 

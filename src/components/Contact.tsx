@@ -28,8 +28,24 @@ const Contact = () => {
     message: ''
   });
 
-  const handleWhatsApp = () => {
-    window.open('https://wa.me/9779741690374', '_blank');
+  const handleWhatsApp = async () => {
+    try {
+      // Send WhatsApp message via edge function
+      await supabase.functions.invoke('whatsapp-send', {
+        body: {
+          to: '9779741690374',
+          message: 'Hello! I am interested in your real estate services. Could you please provide more information?'
+        }
+      });
+      
+      toast({
+        title: "WhatsApp Message Sent!",
+        description: "We'll respond to you shortly.",
+      });
+    } catch (error) {
+      // Fallback to opening WhatsApp Web
+      window.open('https://wa.me/9779741690374?text=Hello! I am interested in your real estate services. Could you please provide more information?', '_blank');
+    }
   };
 
   const handleCall = () => {
@@ -45,6 +61,7 @@ const Contact = () => {
     setIsSubmitting(true);
 
     try {
+      // Save to database
       const { error } = await supabase
         .from('inquiries')
         .insert([{
@@ -57,6 +74,43 @@ const Contact = () => {
         }]);
 
       if (error) throw error;
+
+      // Send email notification
+      try {
+        await supabase.functions.invoke('send-email', {
+          body: {
+            to: 'sumanghimire138@gmail.com',
+            subject: `New Inquiry from ${formData.fullName}`,
+            html: `
+              <div style="font-family: Arial, sans-serif; padding: 20px;">
+                <h2 style="color: #333;">New Property Inquiry</h2>
+                <div style="background: #f5f5f5; padding: 15px; border-radius: 5px; margin: 15px 0;">
+                  <p><strong>Name:</strong> ${formData.fullName}</p>
+                  <p><strong>Phone:</strong> ${formData.phone}</p>
+                  <p><strong>Email:</strong> ${formData.email}</p>
+                  <p><strong>Property Interest:</strong> ${formData.propertyInterest}</p>
+                  <p><strong>Message:</strong> ${formData.message}</p>
+                </div>
+                <p style="color: #666; font-size: 14px;">This inquiry was submitted through your real estate website contact form.</p>
+              </div>
+            `
+          }
+        });
+      } catch (emailError) {
+        console.error('Email notification failed:', emailError);
+      }
+
+      // Send WhatsApp notification (optional)
+      try {
+        await supabase.functions.invoke('whatsapp-send', {
+          body: {
+            to: '9779741690374',
+            message: `🏠 New Property Inquiry\n\nName: ${formData.fullName}\nPhone: ${formData.phone}\nEmail: ${formData.email}\nInterest: ${formData.propertyInterest}\n\nMessage: ${formData.message}`
+          }
+        });
+      } catch (whatsappError) {
+        console.error('WhatsApp notification failed:', whatsappError);
+      }
 
       toast({
         title: "Message Sent Successfully!",

@@ -82,10 +82,29 @@ const InquiriesList = ({ loading }: InquiriesListProps) => {
     }
   };
 
-  const handleWhatsApp = (phone: string, name: string) => {
-    const message = `Hello ${name}, thank you for your inquiry. How can we assist you further?`;
-    const whatsappUrl = `https://wa.me/${phone.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, '_blank');
+  const handleWhatsApp = async (phone: string, name: string) => {
+    try {
+      const message = `Hello ${name}, thank you for your inquiry. How can we assist you further?`;
+      
+      // Send WhatsApp message via edge function
+      await supabase.functions.invoke('whatsapp-send', {
+        body: {
+          to: phone.replace(/\D/g, ''),
+          message: message
+        }
+      });
+      
+      toast({
+        title: "WhatsApp Message Sent!",
+        description: `Message sent to ${name}`,
+      });
+    } catch (error) {
+      console.error('WhatsApp function failed, using fallback:', error);
+      // Fallback to opening WhatsApp Web
+      const message = `Hello ${name}, thank you for your inquiry. How can we assist you further?`;
+      const whatsappUrl = `https://wa.me/${phone.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`;
+      window.open(whatsappUrl, '_blank');
+    }
   };
 
   const handleEmail = (email: string, name: string) => {
