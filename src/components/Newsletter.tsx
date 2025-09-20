@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Send } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
 
 interface NewsletterProps {
   className?: string;
@@ -14,7 +13,7 @@ const Newsletter = ({ className }: NewsletterProps) => {
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubscribe = async (e: React.FormEvent) => {
+  const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!email.trim()) {
@@ -36,36 +35,18 @@ const Newsletter = ({ className }: NewsletterProps) => {
     }
 
     setIsSubmitting(true);
-
-    try {
-      const { error } = await supabase
-        .from('inquiries')
-        .insert([{
-          full_name: 'Newsletter Subscriber',
-          phone: '',
-          email: email,
-          property_interest: '',
-          message: 'Newsletter subscription',
-          inquiry_type: 'newsletter'
-        }]);
-
-      if (error) throw error;
-
-      toast({
+    
+    const subject = encodeURIComponent("New Newsletter Subscription");
+    const body = encodeURIComponent(`Please add ${email} to the newsletter list.`);
+    window.location.href = `mailto:sumanghimire138@gmail.com?subject=${subject}&body=${body}`;
+    
+    toast({
         title: "Successfully subscribed!",
         description: "You'll receive the latest property updates in your inbox.",
       });
 
-      setEmail('');
-    } catch (error) {
-      toast({
-        title: "Subscription failed",
-        description: "Please try again later.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+    setEmail('');
+    setIsSubmitting(false);
   };
 
   return (
