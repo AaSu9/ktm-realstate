@@ -9,11 +9,27 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 
+interface ContactDetails {
+  id: number;
+  phone: string;
+  email: string;
+  address: string;
+  facebook_url: string;
+  instagram_url: string;
+  youtube_url: string;
+  whatsapp_number: string;
+  map_lat: number;
+  map_lng: number;
+  map_zoom: number;
+  business_hours: { [key: string]: string };
+  updated_at: string;
+}
+
 const AdminContactPage = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [contactDetails, setContactDetails] = useState<any>(null);
+  const [contactDetails, setContactDetails] = useState<Partial<ContactDetails>>({});
 
   useEffect(() => {
     const fetchContactDetails = async () => {
@@ -33,15 +49,15 @@ const AdminContactPage = () => {
     fetchContactDetails();
   }, [toast]);
 
-  const handleInputChange = (field: string, value: any) => {
-    setContactDetails((prev: any) => ({ ...prev, [field]: value }));
+  const handleInputChange = (field: keyof ContactDetails, value: string | number) => {
+    setContactDetails((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleBusinessHoursChange = (day: string, value: string) => {
-    setContactDetails((prev: any) => ({
+    setContactDetails((prev) => ({
       ...prev,
       business_hours: {
-        ...prev.business_hours,
+        ...(prev.business_hours || {}),
         [day]: value,
       },
     }));
@@ -104,7 +120,7 @@ const AdminContactPage = () => {
               </div>
               <div className="space-y-2">
                 <Label>WhatsApp Number</Label>
-                <Input value={contactDetails?.whatsapp_number || ''} onChange={(e) => handleInputChange('whatsapp_number', e.target.value)} />
+                <Input value={contactDetails?.whatsapp_.number || ''} onChange={(e) => handleInputChange('whatsapp_number', e.target.value)} />
               </div>
             </div>
 
@@ -123,7 +139,7 @@ const AdminContactPage = () => {
                 </div>
                 <div className="space-y-2">
                   <Label>Zoom Level</Label>
-                  <Input type="number" value={contactDetails?.map_zoom || ''} onChange={(e) => handleInputChange('map_zoom', parseInt(e.target.value))} />
+                  <Input type="number" value={contactDetails?.map_zoom || ''} onChange={(e) => handleInputChange('map_zoom', parseInt(e.target.value, 10))} />
                 </div>
               </CardContent>
             </Card>

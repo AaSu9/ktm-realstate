@@ -6,6 +6,23 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import PropertyDetailsModal from './PropertyDetailsModal';
 
+interface Property {
+  id: string;
+  title: string;
+  location: string;
+  price: number;
+  images: string[];
+  bedrooms?: number;
+  bathrooms?: number;
+  area_sqft?: number;
+  property_type: string;
+  is_featured: boolean;
+  is_hot_deal: boolean;
+  discount_percentage: number;
+  category: string;
+  status?: string;
+}
+
 interface PropertyCardProps {
   id: string;
   title: string;
@@ -18,7 +35,7 @@ interface PropertyCardProps {
   type: 'sale' | 'rent';
   featured?: boolean;
   discount?: string;
-  property?: any; // Full property object for detailed view
+  property: Property;
 }
 
 const PropertyCard = ({ 

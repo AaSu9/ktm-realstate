@@ -14,8 +14,18 @@ import {
   MessageCircle
 } from 'lucide-react';
 
+interface ContactDetails {
+  phone: string;
+  email: string;
+  address: string;
+  facebook_url: string;
+  instagram_url: string;
+  youtube_url: string;
+  whatsapp_number: string;
+}
+
 const Footer = () => {
-  const [contactDetails, setContactDetails] = useState<any>(null);
+  const [contactDetails, setContactDetails] = useState<ContactDetails | null>(null);
 
   useEffect(() => {
     const fetchContactDetails = async () => {
@@ -27,7 +37,7 @@ const Footer = () => {
       if (error && error.code !== 'PGRST116') {
         console.error('Error fetching footer contact details:', error);
       } else {
-        setContactDetails(data);
+        setContactDetails(data as ContactDetails);
       }
     };
     fetchContactDetails();

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -27,7 +27,7 @@ const InquiriesList = ({ loading }: InquiriesListProps) => {
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const { toast } = useToast();
 
-  const fetchInquiries = async () => {
+  const fetchInquiries = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from('inquiries')
@@ -44,7 +44,7 @@ const InquiriesList = ({ loading }: InquiriesListProps) => {
         variant: "destructive",
       });
     }
-  };
+  }, [toast]);
 
   const updateInquiryStatus = async (inquiryId: string, status: string) => {
     try {
@@ -120,7 +120,7 @@ const InquiriesList = ({ loading }: InquiriesListProps) => {
 
   useEffect(() => {
     fetchInquiries();
-  }, []);
+  }, [fetchInquiries]);
 
   if (loading) {
     return (

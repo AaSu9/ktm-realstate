@@ -19,10 +19,21 @@ import {
   Youtube
 } from 'lucide-react';
 
+interface ContactDetails {
+  phone: string;
+  whatsapp_number: string;
+  email: string;
+  address: string;
+  facebook_url: string;
+  instagram_url: string;
+  youtube_url: string;
+  business_hours: { [key: string]: string };
+}
+
 const Contact = () => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [contactDetails, setContactDetails] = useState<any>(null);
+  const [contactDetails, setContactDetails] = useState<ContactDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
     fullName: '',
@@ -44,7 +55,7 @@ const Contact = () => {
         console.error('Error fetching contact details:', error);
         toast({ title: 'Error', description: 'Could not load contact information.', variant: 'destructive' });
       } else {
-        setContactDetails(data);
+        setContactDetails(data as ContactDetails);
       }
       setLoading(false);
     };
@@ -95,8 +106,9 @@ const Contact = () => {
 
       toast({ title: "Message Sent!", description: "We'll get back to you soon." });
       setFormData({ fullName: '', phone: '', email: '', propertyInterest: '', message: '' });
-    } catch (error: any) {
-      toast({ title: "Error", description: error.message || "Failed to send message.", variant: "destructive" });
+    } catch (error) {
+      const err = error as { message: string };
+      toast({ title: "Error", description: err.message || "Failed to send message.", variant: "destructive" });
     } finally {
       setIsSubmitting(false);
     }
@@ -238,7 +250,7 @@ const Contact = () => {
                     {Object.entries(contactDetails.business_hours).map(([day, time]) => (
                       <div key={day} className="flex justify-between">
                         <span className="text-muted-foreground">{day}:</span>
-                        <span className="text-foreground font-medium">{time as string}</span>
+                        <span className="text-foreground font-medium">{time}</span>
                       </div>
                     ))}
                   </div>

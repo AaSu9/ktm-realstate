@@ -7,9 +7,20 @@ import { Button } from '@/components/ui/button';
 import { MapPin, Navigation, Phone, MessageCircle, Mail } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 
+interface ContactDetails {
+  address: string;
+  phone: string;
+  whatsapp_number: string;
+  email: string;
+  map_lat: number;
+  map_lng: number;
+  map_zoom: number;
+  business_hours: { [key: string]: string };
+}
+
 const GoogleMaps = () => {
   const { toast } = useToast();
-  const [contactDetails, setContactDetails] = useState<any>(null);
+  const [contactDetails, setContactDetails] = useState<ContactDetails | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -24,7 +35,7 @@ const GoogleMaps = () => {
         console.error('Error fetching contact details:', error);
         toast({ title: 'Error', description: 'Could not load map information.', variant: 'destructive' });
       } else {
-        setContactDetails(data);
+        setContactDetails(data as ContactDetails);
       }
       setLoading(false);
     };

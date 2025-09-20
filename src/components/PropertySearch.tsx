@@ -6,8 +6,25 @@ import { Search, MapPin, Home, DollarSign } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
+interface Property {
+  id: string;
+  title: string;
+  location: string;
+  price: number;
+  images: string[];
+  bedrooms?: number;
+  bathrooms?: number;
+  area_sqft?: number;
+  property_type: string;
+  is_featured: boolean;
+  is_hot_deal: boolean;
+  discount_percentage: number;
+  category: string;
+  status?: string;
+}
+
 interface PropertySearchProps {
-  onSearchResults?: (results: any[]) => void;
+  onSearchResults?: (results: Property[]) => void;
   className?: string;
 }
 
@@ -61,7 +78,7 @@ const PropertySearch = ({ onSearchResults, className }: PropertySearchProps) => 
           title: `Found ${data.length} properties`,
           description: `Properties matching your search criteria in ${searchData.location}`,
         });
-        onSearchResults?.(data);
+        onSearchResults?.(data as Property[]);
       } else {
         toast({
           title: "No properties found",
