@@ -1,9 +1,11 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import PropertyCard from './PropertyCard';
 import { Filter, ArrowRight } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
+import { supabase } from '@/integrations/supabase/client';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface Property {
   id: string;
@@ -22,23 +24,48 @@ interface Property {
   status?: string;
 }
 
-const FeaturedProperties = ({ initialProperties }) => {
+const FeaturedProperties = () => {
   const [activeTab, setActiveTab] = useState('all');
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchProperties = async () => {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('properties')
+        .select('*')
+        .eq('status', 'available')
+        .order('created_at', { ascending: false })
+        .limit(20);
+
+      if (error) {
+        console.error('Error fetching properties:', error);
+        setError('Failed to load properties. Please try again later.');
+      } else {
+        setProperties(data || []);
+      }
+      setLoading(false);
+    };
+
+    fetchProperties();
+  }, []);
 
   const filteredProperties = useMemo(() => {
     if (activeTab === 'all') {
-      return initialProperties;
+      return properties;
     } else if (activeTab === 'featured') {
-      return initialProperties.filter(p => p.is_featured);
+      return properties.filter(p => p.is_featured);
     } else if (activeTab === 'sale') {
-      return initialProperties.filter(p => p.category === 'sale');
+      return properties.filter(p => p.category === 'sale');
     } else if (activeTab === 'rent') {
-      return initialProperties.filter(p => p.category === 'rent');
+      return properties.filter(p => p.category === 'rent');
     } else if (activeTab === 'hot-deals') {
-      return initialProperties.filter(p => p.is_hot_deal);
+      return properties.filter(p => p.is_hot_deal);
     }
     return [];
-  }, [activeTab, initialProperties]);
+  }, [activeTab, properties]);
 
   return (
     <section className="py-20 bg-gradient-to-br from-background to-muted/30">
@@ -65,16 +92,35 @@ const FeaturedProperties = ({ initialProperties }) => {
             <TabsTrigger value="featured" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Featured</TabsTrigger>
             <TabsTrigger value="sale" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">For Sale</TabsTrigger>
             <TabsTrigger value="rent" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">For Rent</TabsTrigger>
-            <TabsTrigger value="hot-deals" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">🔥 Hot Deals</TabsTrigger>
+            <TabsTrigger value="hot-deals" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              🔥 Hot Deals
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value={activeTab} className="mt-8">
             {/* Properties Grid */}
-            {filteredProperties.length === 0 ? (
+            {loading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+                {[...Array(6)].map((_, index) => (
+                  <div key={index} className="space-y-4">
+                    <Skeleton className="h-64 w-full" />
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-3/4" />
+                      <Skeleton className="h-4 w-1/2" />
+                      <Skeleton className="h-4 w-1/4" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : error ? (
+              <div className="text-center py-20">
+                <p className="text-red-500 text-lg">{error}</p>
+              </div>
+            ) : filteredProperties.length === 0 ? (
               <div className="text-center py-20">
                 <p className="text-muted-foreground text-lg">No properties found in this category.</p>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="mt-4"
                   onClick={() => setActiveTab('all')}
                 >
@@ -90,18 +136,25 @@ const FeaturedProperties = ({ initialProperties }) => {
                       className="animate-slide-up hover-scale"
                       style={{ animationDelay: `${index * 0.1}s` }}
                     >
-                      <PropertyCard 
+                      <PropertyCard
                         id={property.id}
                         title={property.title}
                         location={property.location}
                         price={`NPR ${property.price.toLocaleString()}`}
-                        image={property.images?.[0] || 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800'}
+                        image={
+                          property.images?.[0] ||
+                          'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800'
+                        }
                         bedrooms={property.bedrooms}
                         bathrooms={property.bathrooms}
                         area={property.area_sqft ? `${property.area_sqft} sq ft` : 'N/A'}
                         type={property.category as 'sale' | 'rent'}
                         featured={property.is_featured}
-                        discount={property.discount_percentage > 0 ? `${property.discount_percentage}% OFF` : undefined}
+                        discount={
+                          property.discount_percentage > 0
+                            ? `${property.discount_percentage}% OFF`
+                            : undefined
+                        }
                         property={property}
                       />
                     </div>
@@ -110,7 +163,7 @@ const FeaturedProperties = ({ initialProperties }) => {
 
                 {/* View All Button */}
                 <div className="text-center animate-fade-in">
-                  <Button 
+                  <Button
                     className="btn-hero hover:scale-105 transition-transform"
                     onClick={() => setActiveTab('all')}
                     size="lg"
@@ -130,15 +183,24 @@ const FeaturedProperties = ({ initialProperties }) => {
             <div className="text-3xl font-bold text-accent mb-2">150+</div>
             <div className="text-muted-foreground">Houses for Sale</div>
           </div>
-          <div className="animate-scale-in bg-card/50 backdrop-blur-.sm rounded-lg p-6 border" style={{ animationDelay: '0.1s' }}>
+          <div
+            className="animate-scale-in bg-card/50 backdrop-blur-.sm rounded-lg p-6 border"
+            style={{ animationDelay: '0.1s' }}
+          >
             <div className="text-3xl font-bold text-accent mb-2">75+</div>
             <div className="text-muted-foreground">Apartments</div>
           </div>
-          <div className="animate-scale-in bg-card/50 backdrop-blur-sm rounded-lg p-6 border" style={{ animationDelay: '0.2s' }}>
+          <div
+            className="animate-scale-in bg-card/50 backdrop-blur-sm rounded-lg p-6 border"
+            style={{ animationDelay: '0.2s' }}
+          >
             <div className="text-3xl font-bold text-accent mb-2">200+</div>
             <div className="text-muted-foreground">Land Plots</div>
           </div>
-          <div className="animate-scale-in bg-card/50 backdrop-blur-sm rounded-lg p-6 border" style={{ animationDelay: '0.3s' }}>
+          <div
+            className="animate-scale-in bg-card/50 backdrop-blur-sm rounded-lg p-6 border"
+            style={{ animationDelay: '0.3s' }}
+          >
             <div className="text-3xl font-bold text-accent mb-2">50+</div>
             <div className="text-muted-foreground">Commercial</div>
           </div>

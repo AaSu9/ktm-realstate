@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -46,25 +46,71 @@ const PropertyForm = ({ property, onSubmit, onCancel }: PropertyFormProps) => {
   const [newFeature, setNewFeature] = useState('');
   
   const [formData, setFormData] = useState<Property>({
-    title: property?.title || '',
-    location: property?.location || '',
-    price: property?.price || 0,
-    images: property?.images || [],
-    bedrooms: property?.bedrooms || undefined,
-    bathrooms: property?.bathrooms || undefined,
-    area_sqft: property?.area_sqft || undefined,
-    property_type: property?.property_type || 'apartment',
-    status: property?.status || 'available',
-    is_featured: property?.is_featured || false,
-    is_hot_deal: property?.is_hot_deal || false,
-    discount_percentage: property?.discount_percentage || 0,
-    description: property?.description || '',
-    features: property?.features || [],
-    category: property?.category || 'sale',
-    video_url: property?.video_url || '',
-    youtube_url: property?.youtube_url || '',
-    tiktok_url: property?.tiktok_url || '',
+    title: '',
+    location: '',
+    price: 0,
+    images: [],
+    bedrooms: undefined,
+    bathrooms: undefined,
+    area_sqft: undefined,
+    property_type: 'apartment',
+    status: 'available',
+    is_featured: false,
+    is_hot_deal: false,
+    discount_percentage: 0,
+    description: '',
+    features: [],
+    category: 'sale',
+    video_url: '',
+    youtube_url: '',
+    tiktok_url: '',
   });
+
+  useEffect(() => {
+    if (property) {
+      setFormData({
+        title: property.title || '',
+        location: property.location || '',
+        price: property.price || 0,
+        images: property.images || [],
+        bedrooms: property.bedrooms || undefined,
+        bathrooms: property.bathrooms || undefined,
+        area_sqft: property.area_sqft || undefined,
+        property_type: property.property_type || 'apartment',
+        status: property.status || 'available',
+        is_featured: property.is_featured || false,
+        is_hot_deal: property.is_hot_deal || false,
+        discount_percentage: property.discount_percentage || 0,
+        description: property.description || '',
+        features: property.features || [],
+        category: property.category || 'sale',
+        video_url: property.video_url || '',
+        youtube_url: property.youtube_url || '',
+        tiktok_url: property.tiktok_url || '',
+      });
+    } else {
+      setFormData({
+        title: '',
+        location: '',
+        price: 0,
+        images: [],
+        bedrooms: undefined,
+        bathrooms: undefined,
+        area_sqft: undefined,
+        property_type: 'apartment',
+        status: 'available',
+        is_featured: false,
+        is_hot_deal: false,
+        discount_percentage: 0,
+        description: '',
+        features: [],
+        category: 'sale',
+        video_url: '',
+        youtube_url: '',
+        tiktok_url: '',
+      });
+    }
+  }, [property]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,9 +139,10 @@ const PropertyForm = ({ property, onSubmit, onCancel }: PropertyFormProps) => {
         });
       } else {
         // Create new property
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('properties')
-          .insert([formData]);
+          .insert([formData])
+          .select();
 
         if (error) throw error;
         toast({
