@@ -1,9 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import PropertyCard from './PropertyCard';
-import { supabase } from '@/integrations/supabase/client';
-import { Loader2, Filter, ArrowRight } from 'lucide-react';
+import { Filter, ArrowRight } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 
 interface Property {
@@ -23,45 +22,23 @@ interface Property {
   status?: string;
 }
 
-const FeaturedProperties = () => {
-  const [properties, setProperties] = useState<Property[]>([]);
-  const [loading, setLoading] = useState(true);
+const FeaturedProperties = ({ initialProperties }) => {
   const [activeTab, setActiveTab] = useState('all');
 
-  useEffect(() => {
-    const fetchProperties = async () => {
-      try {
-        let query = supabase
-          .from('properties')
-          .select('*')
-          .eq('status', 'available')
-          .order('created_at', { ascending: false });
-
-        if (activeTab === 'featured') {
-          query = query.eq('is_featured', true);
-        } else if (activeTab === 'sale') {
-          query = query.eq('category', 'sale');
-        } else if (activeTab === 'rent') {
-          query = query.eq('category', 'rent');
-        } else if (activeTab === 'hot-deals') {
-          query = query.eq('is_hot_deal', true);
-        }
-
-        query = query.limit(20);
-
-        const { data, error } = await query;
-
-        if (error) throw error;
-        setProperties(data || []);
-      } catch (error) {
-        console.error('Error fetching properties:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProperties();
-  }, [activeTab]);
+  const filteredProperties = useMemo(() => {
+    if (activeTab === 'all') {
+      return initialProperties;
+    } else if (activeTab === 'featured') {
+      return initialProperties.filter(p => p.is_featured);
+    } else if (activeTab === 'sale') {
+      return initialProperties.filter(p => p.category === 'sale');
+    } else if (activeTab === 'rent') {
+      return initialProperties.filter(p => p.category === 'rent');
+    } else if (activeTab === 'hot-deals') {
+      return initialProperties.filter(p => p.is_hot_deal);
+    }
+    return [];
+  }, [activeTab, initialProperties]);
 
   return (
     <section className="py-20 bg-gradient-to-br from-background to-muted/30">
@@ -93,25 +70,7 @@ const FeaturedProperties = () => {
 
           <TabsContent value={activeTab} className="mt-8">
             {/* Properties Grid */}
-            {loading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-                {[1, 2, 3, 4, 5, 6].map((i) => (
-                  <Card key={i} className="property-card animate-pulse">
-                    <div className="h-64 bg-muted rounded-t-lg"></div>
-                    <CardContent className="p-6">
-                      <div className="h-6 bg-muted rounded mb-2"></div>
-                      <div className="h-4 bg-muted rounded mb-4 w-3/4"></div>
-                      <div className="flex justify-between mb-4">
-                        <div className="h-4 bg-muted rounded w-16"></div>
-                        <div className="h-4 bg-muted rounded w-16"></div>
-                        <div className="h-4 bg-muted rounded w-16"></div>
-                      </div>
-                      <div className="h-10 bg-muted rounded"></div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            ) : properties.length === 0 ? (
+            {filteredProperties.length === 0 ? (
               <div className="text-center py-20">
                 <p className="text-muted-foreground text-lg">No properties found in this category.</p>
                 <Button 
@@ -125,7 +84,7 @@ const FeaturedProperties = () => {
             ) : (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-                  {properties.map((property, index) => (
+                  {filteredProperties.map((property, index) => (
                     <div
                       key={property.id}
                       className="animate-slide-up hover-scale"
@@ -153,10 +112,10 @@ const FeaturedProperties = () => {
                 <div className="text-center animate-fade-in">
                   <Button 
                     className="btn-hero hover:scale-105 transition-transform"
-                    onClick={() => window.location.href = '#contact'}
+                    onClick={() => setActiveTab('all')}
                     size="lg"
                   >
-                    View All Properties ({properties.length}+ available)
+                    View All
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                 </div>
@@ -171,7 +130,7 @@ const FeaturedProperties = () => {
             <div className="text-3xl font-bold text-accent mb-2">150+</div>
             <div className="text-muted-foreground">Houses for Sale</div>
           </div>
-          <div className="animate-scale-in bg-card/50 backdrop-blur-sm rounded-lg p-6 border" style={{ animationDelay: '0.1s' }}>
+          <div className="animate-scale-in bg-card/50 backdrop-blur-.sm rounded-lg p-6 border" style={{ animationDelay: '0.1s' }}>
             <div className="text-3xl font-bold text-accent mb-2">75+</div>
             <div className="text-muted-foreground">Apartments</div>
           </div>

@@ -7,8 +7,29 @@ import GoogleMaps from '@/components/GoogleMaps';
 import Contact from '@/components/Contact';
 import Footer from '@/components/Footer';
 import QuickActions from '@/components/QuickActions';
+import { supabase } from '@/integrations/supabase/client';
 
-const Index = () => {
+export async function getStaticProps() {
+  const { data: properties, error } = await supabase
+    .from('properties')
+    .select('*')
+    .eq('status', 'available')
+    .order('created_at', { ascending: false })
+    .limit(20);
+
+  if (error) {
+    console.error('Error fetching properties:', error);
+  }
+
+  return {
+    props: {
+      properties: properties || [],
+    },
+    revalidate: 60, // Re-generate the page every 60 seconds
+  };
+}
+
+const Index = ({ properties }) => {
   return (
     <div className="min-h-screen">
       <Navigation />
@@ -17,7 +38,7 @@ const Index = () => {
           <Hero />
         </section>
         <section id="properties">
-          <FeaturedProperties />
+          <FeaturedProperties initialProperties={properties} />
         </section>
         <section id="services">
           <Services />
