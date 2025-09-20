@@ -5,7 +5,7 @@ CREATE TABLE public.properties (
   description TEXT,
   price DECIMAL(15,2) NOT NULL,
   location TEXT NOT NULL,
-  property_type TEXT NOT NULL CHECK (property_type IN ('house', 'apartment', 'land', 'commercial')),
+  property_type TEXT NOT NULL CHECK (property_type IN ('house', 'apartment', 'land', 'commercial', 'villa', 'penthouse', 'studio', 'condo', 'office', 'townhouse')),
   category TEXT NOT NULL CHECK (category IN ('sale', 'rent')),
   bedrooms INTEGER,
   bathrooms INTEGER,
@@ -77,9 +77,3 @@ CREATE TRIGGER update_properties_updated_at
 BEFORE UPDATE ON public.properties
 FOR EACH ROW
 EXECUTE FUNCTION public.update_updated_at_column();
-
--- Insert sample properties
-INSERT INTO public.properties (title, description, price, location, property_type, category, bedrooms, bathrooms, area_sqft, features, images, is_featured, is_hot_deal) VALUES
-('Modern 3BHK Apartment in Baneshwor', 'Luxurious apartment with modern amenities, parking, and great city views', 15000000, 'Baneshwor, Kathmandu', 'apartment', 'sale', 3, 2, 1200, ARRAY['parking', 'elevator', 'security', 'garden'], ARRAY['https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800'], true, false),
-('Premium Villa in Lalitpur', 'Spacious villa with garden, modern kitchen, and premium finishes', 35000000, 'Lalitpur, Nepal', 'house', 'sale', 4, 3, 2500, ARRAY['garden', 'parking', 'modern_kitchen', 'security'], ARRAY['https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800'], true, true),
-('Commercial Land in Bhaktapur', 'Prime commercial land perfect for business development', 8000000, 'Bhaktapur, Nepal', 'land', 'sale', NULL, NULL, 3000, ARRAY['road_access', 'electricity', 'water'], ARRAY['https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800'], false, true);
