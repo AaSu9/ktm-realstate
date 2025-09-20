@@ -16,12 +16,11 @@ import {
 
 interface ContactDetails {
   phone: string;
-  email: string;
   address: string;
-  facebook_url: string;
-  instagram_url: string;
-  youtube_url: string;
-  whatsapp_number: string;
+  facebook: string;
+  instagram: string;
+  youtube: string;
+  whatsapp: string;
 }
 
 const Footer = () => {
@@ -30,14 +29,14 @@ const Footer = () => {
   useEffect(() => {
     const fetchContactDetails = async () => {
       const { data, error } = await supabase
-        .from('contact_details')
+        .from('contacts')
         .select('*')
         .single();
 
       if (error && error.code !== 'PGRST116') {
         console.error('Error fetching footer contact details:', error);
       } else {
-        setContactDetails(data as ContactDetails);
+        setContactDetails(data as unknown as ContactDetails);
       }
     };
     fetchContactDetails();
@@ -75,12 +74,6 @@ const Footer = () => {
                   </a>
                 </div>
                 <div className="flex items-center">
-                  <Mail className="h-5 w-5 text-accent mr-3" />
-                  <a href={`mailto:${contactDetails.email}`} className="hover:text-accent transition-colors">
-                    {contactDetails.email}
-                  </a>
-                </div>
-                <div className="flex items-center">
                   <MapPin className="h-5 w-5 text-accent mr-3" />
                   <span>{contactDetails.address}</span>
                 </div>
@@ -88,10 +81,10 @@ const Footer = () => {
             )}
 
             <div className="flex space-x-3 mt-6">
-              <Button variant="outline" size="sm" className="border-accent text-accent hover:bg-accent hover:text-accent-foreground" onClick={() => window.open(contactDetails?.facebook_url, '_blank')} disabled={!contactDetails?.facebook_url}><Facebook className="h-4 w-4" /></Button>
-              <Button variant="outline" size="sm" className="border-accent text-accent hover:bg-accent hover:text-accent-foreground" onClick={() => window.open(contactDetails?.instagram_url, '_blank')} disabled={!contactDetails?.instagram_url}><Instagram className="h-4 w-4" /></Button>
-              <Button variant="outline" size="sm" className="border-accent text-accent hover:bg-accent hover:text-accent-foreground" onClick={() => window.open(contactDetails?.youtube_url, '_blank')} disabled={!contactDetails?.youtube_url}><Youtube className="h-4 w-4" /></Button>
-              <Button variant="outline" size="sm" className="border-green-500 text-green-500 hover:bg-green-500 hover:text-white" onClick={() => window.open(`https://wa.me/${contactDetails?.whatsapp_number}`, '_blank')} disabled={!contactDetails?.whatsapp_number}><MessageCircle className="h-4 w-4" /></Button>
+              <Button variant="outline" size="sm" className="border-accent text-accent hover:bg-accent hover:text-accent-foreground" onClick={() => window.open(contactDetails?.facebook, '_blank')} disabled={!contactDetails?.facebook}><Facebook className="h-4 w-4" /></Button>
+              <Button variant="outline" size="sm" className="border-accent text-accent hover:bg-accent hover:text-accent-foreground" onClick={() => window.open(contactDetails?.instagram, '_blank')} disabled={!contactDetails?.instagram}><Instagram className="h-4 w-4" /></Button>
+              <Button variant="outline" size="sm" className="border-accent text-accent hover:bg-accent hover:text-accent-foreground" onClick={() => window.open(contactDetails?.youtube, '_blank')} disabled={!contactDetails?.youtube}><Youtube className="h-4 w-4" /></Button>
+              <Button variant="outline" size="sm" className="border-green-500 text-green-500 hover:bg-green-500 hover:text-white" onClick={() => window.open(`https://wa.me/${contactDetails?.whatsapp}`, '_blank')} disabled={!contactDetails?.whatsapp}><MessageCircle className="h-4 w-4" /></Button>
             </div>
           </div>
 

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import PropertyList from '@/components/admin/PropertyList';
 import PropertyForm from '@/components/admin/PropertyForm';
 import InquiriesList from '@/components/admin/InquiriesList';
+import ContactAdmin from '@/pages/admin/contact'; // Import the new component
 import { supabase } from '@/integrations/supabase/client';
 
 const ADMIN_SECRET = "2059asis@#"; // Replace with an environment variable
@@ -96,13 +97,20 @@ const Admin = () => {
         >
           Inquiries
         </button>
+        <button
+          className={`px-4 py-2 text-lg font-semibold ${currentTab === 'contact' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'}`}
+          onClick={() => setCurrentTab('contact')}
+        >
+          Contact
+        </button>
       </div>
 
       {currentTab === 'properties' && (
         <div>
           <PropertyForm 
             property={selectedProperty} 
-            onSuccess={() => setSelectedProperty(null)} 
+            onSubmit={() => setSelectedProperty(null)} 
+            onCancel={() => setSelectedProperty(null)}
           />
           <PropertyList 
             properties={properties} 
@@ -116,10 +124,14 @@ const Admin = () => {
       )}
 
       {currentTab === 'inquiries' && (
-        <InquiriesList loading={loading} />
+        <InquiriesList inquiries={inquiries} loading={loading} />
+      )}
+      
+      {currentTab === 'contact' && (
+        <ContactAdmin />
       )}
     </div>
   );
 };
 
-export default Admin; 
+export default Admin;
