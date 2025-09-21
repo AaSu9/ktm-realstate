@@ -1,8 +1,28 @@
 import { Button } from '@/components/ui/button';
 import PropertySearch from '@/components/PropertySearch';
 import heroImage from '@/assets/hero-property.jpg';
+import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 const Hero = () => {
+  const [stats, setStats] = useState({ properties_listed: 0, happy_clients: 0, years_experience: 0 });
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      const { data, error } = await supabase
+        .from('stats')
+        .select('*')
+        .single();
+      if (data) {
+        setStats(data);
+      }
+      if(error && error.code !== 'PGRST116') {
+        console.error("Error fetching stats", error)
+      }
+    };
+    fetchStats();
+  }, []);
+
   return (
     <section id="home" className="relative min-h-screen flex items-center justify-center">
       {/* Background Image */}
@@ -24,7 +44,7 @@ const Hero = () => {
               </span>
             </h1>
             <p className="text-xl text-white/90 mb-8 leading-relaxed">
-              Discover premium properties in Nepal's most desirable locations. From luxury homes to prime land investments, we make your real estate dreams a reality.
+              Discover premium properties in Nepal\'s most desirable locations. From luxury homes to prime land investments, we make your real estate dreams a reality.
             </p>
           </div>
 
@@ -35,15 +55,15 @@ const Hero = () => {
           <div className="mt-12 animate-scale-in">
             <div className="grid grid-cols-3 gap-8 text-center">
               <div>
-                <div className="text-3xl font-bold text-white mb-2">500+</div>
+                <div className="text-3xl font-bold text-white mb-2">{stats.properties_listed}+</div>
                 <div className="text-white/80">Properties Listed</div>
               </div>
               <div>
-                <div className="text-3xl font-bold text-white mb-2">1000+</div>
+                <div className="text-3xl font-bold text-white mb-2">{stats.happy_clients}+</div>
                 <div className="text-white/80">Happy Clients</div>
               </div>
               <div>
-                <div className="text-3xl font-bold text-white mb-2">15+</div>
+                <div className="text-3xl font-bold text-white mb-2">{stats.years_experience}+</div>
                 <div className="text-white/80">Years Experience</div>
               </div>
             </div>

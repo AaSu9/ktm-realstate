@@ -1,17 +1,46 @@
+'''import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
 import { MapPin, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const Maps = () => {
+  const [contactDetails, setContactDetails] = useState({ address: '', phone: '', whatsapp: '' });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchContactDetails = async () => {
+      const { data, error } = await supabase
+        .from('contacts')
+        .select('address, phone, whatsapp')
+        .eq('id', 1)
+        .single();
+
+      if (data) {
+        setContactDetails(data);
+      }
+      if(error && error.code !== 'PGRST116') {
+        console.error("Error fetching map details", error)
+      }
+      setLoading(false);
+    };
+    fetchContactDetails();
+  }, []);
+
+
   const handleViewOnMaps = () => {
-    // Opens Google Maps to Kathmandu, Nepal
-    window.open('https://www.google.com/maps/place/Kathmandu,+Nepal/@27.7172453,85.3239605,11z', '_blank');
+    if (!contactDetails.address) return;
+    window.open(`https://maps.google.com/?q=${encodeURIComponent(contactDetails.address)}`, '_blank');
   };
 
   const handleGetDirections = () => {
-    // Opens directions to New Baneshwor, Kathmandu
-    window.open('https://www.google.com/maps/dir//New+Baneshwor,+Kathmandu,+Nepal/', '_blank');
+    if (!contactDetails.address) return;
+    window.open(`https://www.google.com/maps/dir//${encodeURIComponent(contactDetails.address)}`, '_blank');
   };
+
+  if (loading) {
+    return <div className="py-20 text-center">Loading Map...</div>;
+  }
 
   return (
     <section className="py-16 bg-muted/30">
@@ -21,7 +50,7 @@ const Maps = () => {
             Visit Our Office
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Come meet our team in person. We're located in the heart of Kathmandu, ready to help you find your perfect property.
+            Come meet our team in person. We\'re located in the heart of Kathmandu, ready to help you find your perfect property.
           </p>
         </div>
 
@@ -31,7 +60,7 @@ const Maps = () => {
             <CardContent className="p-0">
               <div className="relative w-full h-80">
                 <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3532.6871857777746!2d85.3239605!3d27.7172453!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39eb196c8de7bec5%3A0x3e82b32d60140ce4!2sNew%20Baneshwor%2C%20Kathmandu%2044600%2C%20Nepal!5e0!3m2!1sen!2sus!4v1705123456789!5m2!1sen!2sus"
+                  src={`https://maps.google.com/maps?q=${encodeURIComponent(contactDetails.address)}&output=embed`}
                   width="100%"
                   height="100%"
                   style={{ border: 0 }}
@@ -57,22 +86,27 @@ const Maps = () => {
                       Our Location
                     </h3>
                     <p className="text-muted-foreground mb-4">
-                      New Baneshwor, Kathmandu, Nepal<br />
-                      Near Main Road<br />
-                      Postal Code: 44600
+                      {contactDetails.address.split(',').map((line, index) => (
+                        <span key={index}>
+                          {line}
+                          <br />
+                        </span>
+                      ))}
                     </p>
                     <div className="space-y-3">
-                      <Button 
+                      <Button
                         onClick={handleViewOnMaps}
                         className="w-full justify-center"
                         variant="outline"
+                        disabled={!contactDetails.address}
                       >
                         <ExternalLink className="h-4 w-4 mr-2" />
                         View on Google Maps
                       </Button>
-                      <Button 
+                      <Button
                         onClick={handleGetDirections}
                         className="btn-primary w-full justify-center"
+                        disabled={!contactDetails.address}
                       >
                         <MapPin className="h-4 w-4 mr-2" />
                         Get Directions
@@ -83,7 +117,7 @@ const Maps = () => {
               </CardContent>
             </Card>
 
-            {/* Business Hours */}
+            {/* Business Hours (keeping it static as it\'s not in DB) */}
             <Card className="property-card">
               <CardContent className="p-6">
                 <h3 className="text-xl font-semibold text-foreground mb-4">
@@ -113,15 +147,17 @@ const Maps = () => {
                   Quick Contact
                 </h3>
                 <div className="grid grid-cols-2 gap-3">
-                  <Button 
-                    onClick={() => window.location.href = 'tel:+9779741690374'}
+                  <Button
+                    onClick={() => window.location.href = `tel:${contactDetails.phone}`}
                     className="btn-primary"
+                    disabled={!contactDetails.phone}
                   >
                     Call Now
                   </Button>
-                  <Button 
-                    onClick={() => window.open('https://wa.me/9779741690374', '_blank')}
+                  <Button
+                    onClick={() => window.open(`https://wa.me/${contactDetails.whatsapp}`, '_blank')}
                     className="bg-green-600 hover:bg-green-700 text-white"
+                    disabled={!contactDetails.whatsapp}
                   >
                     WhatsApp
                   </Button>
@@ -135,4 +171,4 @@ const Maps = () => {
   );
 };
 
-export default Maps;
+export default Maps;'''

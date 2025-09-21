@@ -10,58 +10,39 @@ import {
   Shield,
   Heart
 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+
+const iconMap = {
+  Award,
+  Users,
+  Building,
+  Star,
+  CheckCircle,
+  TrendingUp,
+  Shield,
+  Heart,
+};
 
 const About = () => {
-  const achievements = [
-    { icon: Building, value: '500+', label: 'Properties Sold' },
-    { icon: Users, value: '1000+', label: 'Happy Clients' },
-    { icon: Award, value: '15+', label: 'Years Experience' },
-    { icon: Star, value: '4.9/5', label: 'Client Rating' }
-  ];
+  const [achievements, setAchievements] = useState([]);
+  const [values, setValues] = useState([]);
+  const [testimonials, setTestimonials] = useState([]);
 
-  const values = [
-    {
-      icon: Shield,
-      title: 'Trust & Transparency',
-      description: 'We believe in complete transparency in all our dealings, ensuring our clients make informed decisions.'
-    },
-    {
-      icon: Heart,
-      title: 'Client-Centric Approach',
-      description: 'Your satisfaction is our priority. We go above and beyond to exceed your expectations.'
-    },
-    {
-      icon: TrendingUp,
-      title: 'Market Expertise',
-      description: 'Deep understanding of Nepal\'s real estate market trends and opportunities.'
-    },
-    {
-      icon: CheckCircle,
-      title: 'Quality Assurance',
-      description: 'Every property in our portfolio is thoroughly verified and meets our quality standards.'
-    }
-  ];
+  useEffect(() => {
+    const fetchData = async () => {
+      const { data: achievementsData } = await supabase.from('achievements').select('*');
+      setAchievements(achievementsData || []);
 
-  const testimonials = [
-    {
-      name: 'Rajesh Shrestha',
-      role: 'Property Investor',
-      comment: 'KTM Realstate helped me find the perfect investment property. Their market knowledge is exceptional.',
-      rating: 5
-    },
-    {
-      name: 'Priya Tamang',
-      role: 'Homeowner',
-      comment: 'Professional service and transparent dealing. Found my dream home within my budget. Highly recommended!',
-      rating: 5
-    },
-    {
-      name: 'Dinesh Karki',
-      role: 'Business Owner',
-      comment: 'Excellent support for commercial property purchase. The team guided us through every step.',
-      rating: 5
-    }
-  ];
+      const { data: valuesData } = await supabase.from('company_values').select('*');
+      setValues(valuesData || []);
+
+      const { data: testimonialsData } = await supabase.from('testimonials').select('*');
+      setTestimonials(testimonialsData || []);
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <section id="about" className="py-20 bg-background">
@@ -105,23 +86,26 @@ const About = () => {
 
           {/* Achievements Grid */}
           <div className="grid grid-cols-2 gap-6">
-            {achievements.map((achievement, index) => (
-              <Card
-                key={achievement.label}
-                className="property-card text-center animate-scale-in"
-                style={{ animationDelay: `${index * 0.1}s` }}
-              >
-                <CardContent className="p-6">
-                  <achievement.icon className="h-12 w-12 text-accent mx-auto mb-4" />
-                  <div className="text-3xl font-bold text-foreground mb-2">
-                    {achievement.value}
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    {achievement.label}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+            {achievements.map((achievement, index) => {
+              const Icon = iconMap[achievement.icon];
+              return (
+                <Card
+                  key={achievement.label}
+                  className="property-card text-center animate-scale-in"
+                  style={{ animationDelay: `${index * 0.1}s` }}
+                >
+                  <CardContent className="p-6">
+                    {Icon && <Icon className="h-12 w-12 text-accent mx-auto mb-4" />}
+                    <div className="text-3xl font-bold text-foreground mb-2">
+                      {achievement.value}
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      {achievement.label}
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         </div>
 
@@ -137,25 +121,28 @@ const About = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {values.map((value, index) => (
-              <Card
-                key={value.title}
-                className="property-card text-center animate-slide-up"
-                style={{ animationDelay: `${index * 0.1}s` }}
-              >
-                <CardContent className="p-6">
-                  <div className="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <value.icon className="h-8 w-8 text-accent" />
-                  </div>
-                  <h4 className="text-lg font-semibold text-foreground mb-3">
-                    {value.title}
-                  </h4>
-                  <p className="text-sm text-muted-foreground">
-                    {value.description}
-                  </p>
-                </CardContent>
-              </Card>
-            ))}
+            {values.map((value, index) => {
+              const Icon = iconMap[value.icon];
+              return (
+                <Card
+                  key={value.title}
+                  className="property-card text-center animate-slide-up"
+                  style={{ animationDelay: `${index * 0.1}s` }}
+                >
+                  <CardContent className="p-6">
+                    <div className="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                      {Icon && <Icon className="h-8 w-8 text-accent" />}
+                    </div>
+                    <h4 className="text-lg font-semibold text-foreground mb-3">
+                      {value.title}
+                    </h4>
+                    <p className="text-sm text-muted-foreground">
+                      {value.description}
+                    </p>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         </div>
 

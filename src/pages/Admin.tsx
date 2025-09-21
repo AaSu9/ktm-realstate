@@ -3,6 +3,10 @@ import PropertyList from '@/components/admin/PropertyList';
 import PropertyForm from '@/components/admin/PropertyForm';
 import InquiriesList from '@/components/admin/InquiriesList';
 import ContactAdmin from '@/pages/admin/contact'; // Import the new component
+import AdminStats from '@/pages/admin/stats';
+import AdminTestimonials from '@/pages/admin/testimonials';
+import AdminValues from '@/pages/admin/values';
+import AdminAchievements from '@/pages/admin/achievements';
 import { supabase } from '@/integrations/supabase/client';
 
 const ADMIN_SECRET = "2059asis@#"; // Replace with an environment variable
@@ -103,6 +107,30 @@ const Admin = () => {
         >
           Contact
         </button>
+        <button
+          className={`px-4 py-2 text-lg font-semibold ${currentTab === 'stats' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'}`}
+          onClick={() => setCurrentTab('stats')}
+        >
+          Stats
+        </button>
+        <button
+          className={`px-4 py-2 text-lg font-semibold ${currentTab === 'testimonials' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'}`}
+          onClick={() => setCurrentTab('testimonials')}
+        >
+          Testimonials
+        </button>
+        <button
+          className={`px-4 py-2 text-lg font-semibold ${currentTab === 'values' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'}`}
+          onClick={() => setCurrentTab('values')}
+        >
+          Values
+        </button>
+        <button
+          className={`px-4 py-2 text-lg font-semibold ${currentTab === 'achievements' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'}`}
+          onClick={() => setCurrentTab('achievements')}
+        >
+          Achievements
+        </button>
       </div>
 
       {currentTab === 'properties' && (
@@ -130,6 +158,11 @@ const Admin = () => {
       {currentTab === 'contact' && (
         <ContactAdmin />
       )}
+
+      {currentTab === 'stats' && <AdminStats />}
+      {currentTab === 'testimonials' && <AdminTestimonials />}
+      {currentTab === 'values' && <AdminValues />}
+      {currentTab === 'achievements' && <AdminAchievements />}
     </div>
   );
 };
