@@ -1,23 +1,55 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Phone, MessageCircle, Mail, MapPin } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
+interface QuickContactDetails {
+  phone: string | null;
+  whatsapp: string | null;
+  email: string | null;
+  address: string | null;
+}
+
 const QuickActions = () => {
   const { toast } = useToast();
-  
+  const [contactDetails, setContactDetails] = useState<QuickContactDetails | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchContactDetails = async () => {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('contacts')
+        .select('phone, whatsapp, email, address')
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error fetching quick contact details:', error);
+      } else {
+        setContactDetails(data);
+      }
+      setLoading(false);
+    };
+
+    fetchContactDetails();
+  }, []);
+
   const handleCall = () => {
-    // For mobile devices, this will trigger the phone dialer
-    window.location.href = 'tel:+9779741690374';
+    if (!contactDetails?.phone) return;
+    window.location.href = `tel:${contactDetails.phone}`;
   };
 
   const handleWhatsApp = async () => {
+    if (!contactDetails?.whatsapp) return;
+    
     try {
-      // Send WhatsApp message via edge function
       await supabase.functions.invoke('whatsapp-send', {
         body: {
-          to: '9779741690374',
+          to: contactDetails.whatsapp,
           message: 'Hi! I am interested in your real estate services. Can you help me find a property?'
         }
       });
@@ -28,44 +60,29 @@ const QuickActions = () => {
       });
     } catch (error) {
       console.error('WhatsApp function failed, using fallback:', error);
-      // Fallback to opening WhatsApp Web
       const message = encodeURIComponent('Hi! I am interested in your real estate services. Can you help me find a property?');
-      const whatsappUrl = `https://wa.me/9779741690374?text=${message}`;
-      
-      // Check if it's a mobile device for better WhatsApp experience
-      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      
-      if (isMobile) {
-        // Try to open WhatsApp app first, fallback to web
-        window.location.href = `whatsapp://send?phone=9779741690374&text=${message}`;
-        setTimeout(() => {
-          window.open(whatsappUrl, '_blank');
-        }, 500);
-      } else {
-        window.open(whatsappUrl, '_blank');
-      }
+      const whatsappUrl = `https://wa.me/${contactDetails.whatsapp}?text=${message}`;
+      window.open(whatsappUrl, '_blank');
     }
   };
 
   const handleEmail = () => {
+    if (!contactDetails?.email) return;
     const subject = encodeURIComponent('Real Estate Inquiry from Website');
     const body = encodeURIComponent('Hi,\n\nI am interested in your real estate services. Please contact me to discuss my requirements.\n\nBest regards');
-    window.location.href = `mailto:sumanghimire138@gmail.com?subject=${subject}&body=${body}`;
+    window.location.href = `mailto:${contactDetails.email}?subject=${subject}&body=${body}`;
   };
 
   const handleLocation = () => {
-    // Scroll to maps section first, then optionally open external map
     const mapsSection = document.querySelector('#maps');
     if (mapsSection) {
-      mapsSection.scrollIntoView({ 
-        behavior: 'smooth',
-        block: 'start'
-      });
+      mapsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
-    // Optional: Also open in Google Maps
-    setTimeout(() => {
-      window.open('https://maps.google.com/?q=New+Baneshwor,Kathmandu,Nepal', '_blank');
-    }, 1000);
+    if (contactDetails?.address) {
+        setTimeout(() => {
+            window.open(`https://maps.google.com/?q=${encodeURIComponent(contactDetails.address)}`, '_blank');
+        }, 1000);
+    }
   };
 
   const quickActions = [
@@ -73,27 +90,35 @@ const QuickActions = () => {
       icon: Phone,
       label: 'Call Now',
       action: handleCall,
-      className: 'btn-primary'
+      className: 'btn-primary',
+      disabled: !contactDetails?.phone,
     },
     {
       icon: MessageCircle,
       label: 'WhatsApp',
       action: handleWhatsApp,
-      className: 'bg-green-600 hover:bg-green-700 text-white'
+      className: 'bg-green-600 hover:bg-green-700 text-white',
+      disabled: !contactDetails?.whatsapp,
     },
     {
       icon: Mail,
       label: 'Email Us',
       action: handleEmail,
-      className: 'bg-blue-600 hover:bg-blue-700 text-white'
+      className: 'bg-blue-600 hover:bg-blue-700 text-white',
+      disabled: !contactDetails?.email,
     },
     {
       icon: MapPin,
       label: 'Visit Office',
       action: handleLocation,
-      className: 'bg-purple-600 hover:bg-purple-700 text-white'
+      className: 'bg-purple-600 hover:bg-purple-700 text-white',
+      disabled: !contactDetails?.address,
     }
   ];
+  
+  if (loading || !contactDetails) {
+    return null;
+  }
 
   return (
     <div className="fixed bottom-6 right-6 z-50 hidden md:block">
@@ -106,6 +131,7 @@ const QuickActions = () => {
                 size="sm"
                 className={action.className}
                 onClick={action.action}
+                disabled={action.disabled || loading}
               >
                 <action.icon className="h-4 w-4 mr-2" />
                 {action.label}

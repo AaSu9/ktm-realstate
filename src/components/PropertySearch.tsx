@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -36,14 +36,10 @@ const PropertySearch = ({ onSearchResults, className }: PropertySearchProps) => 
     budget: ''
   });
   const [isSearching, setIsSearching] = useState(false);
+  const isInitialMount = useRef(true);
 
-  const handleSearch = async () => {
-    if (!searchData.location.trim()) {
-      toast({
-        title: "Please enter a location",
-        description: "Location is required to search properties.",
-        variant: "destructive",
-      });
+  const handleSearch = useCallback(async (currentSearchData) => {
+    if (!currentSearchData.location.trim()) {
       return;
     }
 
@@ -53,15 +49,15 @@ const PropertySearch = ({ onSearchResults, className }: PropertySearchProps) => 
       let query = supabase
         .from('properties')
         .select('*')
-        .ilike('location', `%${searchData.location}%`)
+        .ilike('location', `%${currentSearchData.location}%`)
         .eq('status', 'available');
 
-      if (searchData.propertyType) {
-        query = query.eq('property_type', searchData.propertyType);
+      if (currentSearchData.propertyType) {
+        query = query.eq('property_type', currentSearchData.propertyType);
       }
 
-      if (searchData.budget) {
-        const [min, max] = searchData.budget.split('-').map(Number);
+      if (currentSearchData.budget) {
+        const [min, max] = currentSearchData.budget.split('-').map(Number);
         if (max) {
           query = query.gte('price', min * 1000000).lte('price', max * 1000000);
         } else {
@@ -76,7 +72,7 @@ const PropertySearch = ({ onSearchResults, className }: PropertySearchProps) => 
       if (data && data.length > 0) {
         toast({
           title: `Found ${data.length} properties`,
-          description: `Properties matching your search criteria in ${searchData.location}`,
+          description: `Properties matching your search criteria in ${currentSearchData.location}`,
         });
         onSearchResults?.(data as Property[]);
       } else {
@@ -84,6 +80,7 @@ const PropertySearch = ({ onSearchResults, className }: PropertySearchProps) => 
           title: "No properties found",
           description: "Try adjusting your search criteria or contact us for more options.",
         });
+        onSearchResults?.([]);
       }
     } catch (error) {
       toast({
@@ -94,7 +91,38 @@ const PropertySearch = ({ onSearchResults, className }: PropertySearchProps) => 
     } finally {
       setIsSearching(false);
     }
-  };
+  }, [toast, onSearchResults]);
+
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+
+    if (!searchData.location.trim()) {
+      return;
+    }
+
+    const handler = setTimeout(() => {
+      handleSearch(searchData);
+    }, 500); // 500ms debounce
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchData.location, searchData.propertyType, searchData.budget, handleSearch]);
+
+  const handleManualSearchClick = () => {
+    if (!searchData.location.trim()) {
+      toast({
+        title: "Please enter a location",
+        description: "Location is required to search properties.",
+        variant: "destructive",
+      });
+      return;
+    }
+    handleSearch(searchData);
+  }
 
   return (
     <div className={`bg-white/95 backdrop-blur-md rounded-2xl p-6 shadow-luxury ${className}`}>
@@ -141,7 +169,7 @@ const PropertySearch = ({ onSearchResults, className }: PropertySearchProps) => 
       <div className="mt-6 flex flex-col sm:flex-row gap-4">
         <Button 
           className="btn-hero flex-1 h-12" 
-          onClick={handleSearch}
+          onClick={handleManualSearchClick}
           disabled={isSearching}
         >
           <Search className="h-5 w-5 mr-2" />

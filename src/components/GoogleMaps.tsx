@@ -10,12 +10,12 @@ import { Card, CardContent } from '@/components/ui/card';
 interface ContactDetails {
   address: string;
   phone: string;
-  whatsapp_number: string;
+  whatsapp: string;
   email: string;
-  map_lat: number;
-  map_lng: number;
-  map_zoom: number;
-  business_hours: { [key: string]: string };
+  map_lat?: number;
+  map_lng?: number;
+  map_zoom?: number;
+  business_hours?: { [key: string]: string };
 }
 
 const GoogleMaps = () => {
@@ -27,7 +27,7 @@ const GoogleMaps = () => {
     const fetchContactDetails = async () => {
       setLoading(true);
       const { data, error } = await supabase
-        .from('contact_details')
+        .from('contacts')
         .select('*')
         .single();
 
@@ -58,9 +58,9 @@ const GoogleMaps = () => {
   };
 
   const handleWhatsApp = () => {
-    if (!contactDetails?.whatsapp_number) return;
+    if (!contactDetails?.whatsapp) return;
     const message = encodeURIComponent('Hi! I am interested in your real estate services. Can you help me?');
-    window.open(`https://wa.me/${contactDetails.whatsapp_number}?text=${message}`, '_blank');
+    window.open(`https://wa.me/${contactDetails.whatsapp}?text=${message}`, '_blank');
   };
 
   const handleEmail = () => {
@@ -85,7 +85,10 @@ const GoogleMaps = () => {
     );
   }
 
-  const mapEmbedUrl = `https://maps.google.com/maps?q=${contactDetails.map_lat},${contactDetails.map_lng}&z=${contactDetails.map_zoom}&output=embed`;
+  const canDisplayMap = contactDetails.map_lat && contactDetails.map_lng && contactDetails.map_zoom;
+  const mapEmbedUrl = canDisplayMap 
+    ? `https://maps.google.com/maps?q=${contactDetails.map_lat},${contactDetails.map_lng}&z=${contactDetails.map_zoom}&output=embed`
+    : '';
 
   return (
     <section id="maps" className="py-20 bg-gradient-to-br from-muted/20 to-background">
@@ -99,20 +102,22 @@ const GoogleMaps = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
           <div className="space-y-6">
-            <Card className="overflow-hidden">
-              <CardContent className="p-0">
-                <div className="w-full h-96">
-                   <iframe
-                      width="100%"
-                      height="100%"
-                      frameBorder="0"
-                      style={{ border: 0 }}
-                      src={mapEmbedUrl}
-                      allowFullScreen
-                    ></iframe>
-                </div>
-              </CardContent>
-            </Card>
+            {canDisplayMap && (
+              <Card className="overflow-hidden">
+                <CardContent className="p-0">
+                  <div className="w-full h-96">
+                     <iframe
+                        width="100%"
+                        height="100%"
+                        frameBorder="0"
+                        style={{ border: 0 }}
+                        src={mapEmbedUrl}
+                        allowFullScreen
+                      ></iframe>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Button onClick={handleViewOnMaps} className="btn-primary flex items-center gap-2" disabled={!contactDetails?.address}>
@@ -162,7 +167,7 @@ const GoogleMaps = () => {
                   <Button onClick={handleCall} className="w-full btn-primary flex items-center gap-2" disabled={!contactDetails.phone}>
                     <Phone className="h-4 w-4" /> Call Now: {contactDetails.phone}
                   </Button>
-                  <Button onClick={handleWhatsApp} variant="outline" className="w-full flex items-center gap-2" disabled={!contactDetails.whatsapp_number}>
+                  <Button onClick={handleWhatsApp} variant="outline" className="w-full flex items-center gap-2" disabled={!contactDetails.whatsapp}>
                     <MessageCircle className="h-4 w-4" /> WhatsApp Business
                   </Button>
                   <Button onClick={handleEmail} variant="outline" className="w-full flex items-center gap-2" disabled={!contactDetails.email}>

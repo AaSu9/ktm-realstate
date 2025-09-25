@@ -1,16 +1,28 @@
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, ChangeEvent, FormEvent } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 
+interface ContactDetails {
+  id: number;
+  address: string | null;
+  phone: string | null;
+  whatsapp: string | null;
+  facebook: string | null;
+  instagram: string | null;
+  youtube: string | null;
+  youtube_api_key: string | null;
+  youtube_channel_id: string | null;
+}
+
 const ContactAdmin = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
-  const [contactDetails, setContactDetails] = useState({
-    id: 1, // Primary key for the contacts table
+  const [contactDetails, setContactDetails] = useState<ContactDetails>({
+    id: 1,
     address: '',
     phone: '',
     whatsapp: '',
@@ -37,7 +49,7 @@ const ContactAdmin = () => {
         variant: 'destructive',
       });
     } else if (data) {
-      setContactDetails(data);
+      setContactDetails(data as ContactDetails);
     }
     setLoading(false);
   }, [toast]);
@@ -46,18 +58,22 @@ const ContactAdmin = () => {
     fetchContactDetails();
   }, [fetchContactDetails]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setContactDetails(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    
+    const detailsToSave = Object.fromEntries(
+      Object.entries(contactDetails).map(([key, value]) => [key, value === '' ? null : value])
+    );
 
     const { error } = await supabase
       .from('contacts')
-      .upsert(contactDetails, { onConflict: 'id' });
+      .upsert(detailsToSave, { onConflict: 'id' });
 
     if (error) {
       console.error('Error saving contact details:', error);

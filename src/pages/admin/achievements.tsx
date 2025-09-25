@@ -1,12 +1,21 @@
-'''import { useState, useEffect } from 'react';
+import { useState, useEffect, ChangeEvent } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 
+// Interface now allows for null values, matching the database schema
+interface Achievement {
+  id: number;
+  icon: string | null;
+  value: string | null;
+  label: string | null;
+}
+
 const AdminAchievements = () => {
-  const [achievements, setAchievements] = useState([]);
+  const [achievements, setAchievements] = useState<Achievement[]>([]);
+  const [editingAchievement, setEditingAchievement] = useState<Achievement | null>(null);
   const [newAchievement, setNewAchievement] = useState({ icon: '', value: '', label: '' });
   const { toast } = useToast();
 
@@ -16,32 +25,52 @@ const AdminAchievements = () => {
 
   const fetchAchievements = async () => {
     const { data, error } = await supabase.from('achievements').select('*');
-    if (data) setAchievements(data);
+    if (data) setAchievements(data as Achievement[]);
     else if (error) toast({ title: 'Error', description: 'Could not load achievements.', variant: 'destructive' });
   };
 
-  const handleSave = async (achievement) => {
+  const handleSave = async (achievement: Achievement | null) => {
+    if (!achievement) return;
     const { error } = await supabase.from('achievements').update(achievement).eq('id', achievement.id);
-    if (error) toast({ title: 'Error', description: 'Could not save achievement.', variant: 'destructive' });
-    else toast({ title: 'Success', description: 'Achievement saved.' });
+    if (error) {
+      toast({ title: 'Error', description: 'Could not save achievement.', variant: 'destructive' });
+    } else {
+      fetchAchievements();
+      setEditingAchievement(null);
+      toast({ title: 'Success', description: 'Achievement saved.' });
+    }
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (id: number) => {
     const { error } = await supabase.from('achievements').delete().eq('id', id);
-    if (error) toast({ title: 'Error', description: 'Could not delete achievement.', variant: 'destructive' });
-    else {
+    if (error) {
+      toast({ title: 'Error', description: 'Could not delete achievement.', variant: 'destructive' });
+    } else {
       fetchAchievements();
       toast({ title: 'Success', description: 'Achievement deleted.' });
     }
   };
 
   const handleCreate = async () => {
-    const { error } = await supabase.from('achievements').insert([newAchievement]);
-    if (error) toast({ title: 'Error', description: 'Could not create achievement.', variant: 'destructive' });
-    else {
+    // Ensure empty strings are not sent as null if the db expects strings
+    const achievementToCreate = {
+        icon: newAchievement.icon || null,
+        value: newAchievement.value || null,
+        label: newAchievement.label || null,
+    };
+    const { error } = await supabase.from('achievements').insert([achievementToCreate]);
+    if (error) {
+      toast({ title: 'Error', description: 'Could not create achievement.', variant: 'destructive' });
+    } else {
       fetchAchievements();
       setNewAchievement({ icon: '', value: '', label: '' });
       toast({ title: 'Success', description: 'Achievement created.' });
+    }
+  };
+  
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>, field: keyof Omit<Achievement, 'id'>) => {
+    if (editingAchievement) {
+        setEditingAchievement({ ...editingAchievement, [field]: e.target.value });
     }
   };
 
@@ -63,10 +92,11 @@ const AdminAchievements = () => {
         {achievements.map(a => (
           <Card key={a.id}>
             <CardContent className="p-4">
-              <Input value={a.icon} onChange={(e) => setAchievements(achievements.map(i => i.id === a.id ? { ...i, icon: e.target.value } : i))} className="mb-2" />
-              <Input value={a.value} onChange={(e) => setAchievements(achievements.map(i => i.id === a.id ? { ...i, value: e.target.value } : i))} className="mb-2" />
-              <Input value={a.label} onChange={(e) => setAchievements(achievements.map(i => i.id === a.id ? { ...i, label: e.target.value } : i))} className="mb-2" />
-              <Button onClick={() => handleSave(a)} className="mr-2">Save</Button>
+              {/* Inputs now use '|| ''' to prevent passing null to the value prop */}
+              <Input value={(editingAchievement && editingAchievement.id === a.id ? editingAchievement.icon : a.icon) || ''} onChange={(e) => handleInputChange(e, 'icon')} onFocus={() => setEditingAchievement(a)} className="mb-2" />
+              <Input value={(editingAchievement && editingAchievement.id === a.id ? editingAchievement.value : a.value) || ''} onChange={(e) => handleInputChange(e, 'value')} onFocus={() => setEditingAchievement(a)} className="mb-2" />
+              <Input value={(editingAchievement && editingAchievement.id === a.id ? editingAchievement.label : a.label) || ''} onChange={(e) => handleInputChange(e, 'label')} onFocus={() => setEditingAchievement(a)} className="mb-2" />
+              <Button onClick={() => handleSave(editingAchievement)} className="mr-2" disabled={!editingAchievement || editingAchievement.id !== a.id}>Save</Button>
               <Button onClick={() => handleDelete(a.id)} variant="destructive">Delete</Button>
             </CardContent>
           </Card>
@@ -76,4 +106,4 @@ const AdminAchievements = () => {
   );
 };
 
-export default AdminAchievements;'''
+export default AdminAchievements;
