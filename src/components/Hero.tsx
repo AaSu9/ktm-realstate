@@ -4,7 +4,28 @@ import heroImage from '@/assets/hero-property.jpg';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
-const Hero = () => {
+interface Property {
+  id: string;
+  title: string;
+  location: string;
+  price: number;
+  images: string[];
+  bedrooms?: number;
+  bathrooms?: number;
+  area_sqft?: number;
+  property_type: string;
+  is_featured: boolean;
+  is_hot_deal: boolean;
+  discount_percentage: number;
+  category: string;
+  status?: string;
+}
+
+interface HeroProps {
+  onSearchResults: (results: Property[]) => void;
+}
+
+const Hero = ({ onSearchResults }: HeroProps) => {
   const [stats, setStats] = useState({ properties_listed: 0, happy_clients: 0, years_experience: 0 });
 
   useEffect(() => {
@@ -49,7 +70,7 @@ const Hero = () => {
           </div>
 
           {/* Search Form */}
-          <PropertySearch className="animate-slide-up" />
+          <PropertySearch className="animate-slide-up" onSearchResults={onSearchResults} />
 
           {/* Stats */}
           <div className="mt-12 animate-scale-in">

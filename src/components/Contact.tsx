@@ -138,10 +138,10 @@ const Contact = () => {
     },
     {
       icon: MapPin,
-      title: 'Office',
+      title: 'Get Directions',
       details: contactDetails.address,
       subtitle: 'Visit us for consultation',
-      action: () => window.open(`https://maps.google.com/?q=${encodeURIComponent(contactDetails.address)}`, '_blank')
+      action: () => window.open(`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(contactDetails.address)}`, '_blank')
     }
   ] : [];
 
@@ -195,22 +195,29 @@ const Contact = () => {
           </div>
 
           <div className="space-y-6">
-            {contactInfo.map((info, index) => (
-              <Card key={info.title} className="property-card cursor-pointer animate-slide-up" style={{ animationDelay: `${index * 0.1}s` }} onClick={info.action}>
-                <CardContent className="p-6">
-                  <div className="flex items-start space-x-4">
-                    <div className="w-12 h-12 bg-accent/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <info.icon className="h-6 w-6 text-accent" />
-                    </div>
-                    <div>
-                      <h4 className="text-lg font-semibold text-foreground mb-1">{info.title}</h4>
-                      <p className="text-accent font-medium mb-1">{info.details}</p>
-                      <p className="text-sm text-muted-foreground">{info.subtitle}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+            <Card className="property-card">
+              <CardContent className="p-8">
+                <h3 className="text-2xl font-semibold text-foreground mb-6">Quick Contacts</h3>
+                <div className="space-y-4">
+                  {contactInfo.map((info, index) => (
+                    <Card key={info.title} className="property-card cursor-pointer animate-slide-up" style={{ animationDelay: `${index * 0.1}s` }} onClick={info.action}>
+                      <CardContent className="p-6">
+                        <div className="flex items-start space-x-4">
+                          <div className="w-12 h-12 bg-accent/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                            <info.icon className="h-6 w-6 text-accent" />
+                          </div>
+                          <div>
+                            <h4 className="text-lg font-semibold text-foreground mb-1">{info.title}</h4>
+                            <p className="text-accent font-medium mb-1">{info.details}</p>
+                            <p className="text-sm text-muted-foreground">{info.subtitle}</p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
 
             <div className="grid grid-cols-2 gap-4 mt-8">
               <Button className="btn-primary h-14 text-lg" onClick={handleCall} disabled={!contactDetails?.phone}>

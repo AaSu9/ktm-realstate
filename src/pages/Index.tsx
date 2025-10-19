@@ -8,17 +8,37 @@ import Contact from '@/components/Contact';
 import Footer from '@/components/Footer';
 import QuickActions from '@/components/QuickActions';
 import YouTube from '@/components/Youtube';
+import { useState } from 'react';
+
+interface Property {
+  id: string;
+  title: string;
+  location: string;
+  price: number;
+  images: string[];
+  bedrooms?: number;
+  bathrooms?: number;
+  area_sqft?: number;
+  property_type: string;
+  is_featured: boolean;
+  is_hot_deal: boolean;
+  discount_percentage: number;
+  category: string;
+  status?: string;
+}
 
 const Index = () => {
+  const [searchResults, setSearchResults] = useState<Property[] | undefined>(undefined);
+
   return (
     <div className="min-h-screen">
       <Navigation />
       <main>
         <section id="home">
-          <Hero />
+          <Hero onSearchResults={setSearchResults} />
         </section>
         <section id="properties">
-          <FeaturedProperties initialProperties={undefined} />
+          <FeaturedProperties searchResults={searchResults} />
         </section>
         <section id="services">
           <Services />

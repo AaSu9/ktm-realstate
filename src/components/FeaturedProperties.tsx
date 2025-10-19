@@ -24,13 +24,23 @@ interface Property {
   status?: string;
 }
 
-const FeaturedProperties = () => {
+interface FeaturedPropertiesProps {
+  searchResults?: Property[];
+}
+
+const FeaturedProperties = ({ searchResults }: FeaturedPropertiesProps) => {
   const [activeTab, setActiveTab] = useState('all');
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (searchResults) {
+      setProperties(searchResults);
+      setLoading(false);
+      return;
+    }
+
     const fetchProperties = async () => {
       setLoading(true);
       const { data, error } = await supabase
@@ -50,22 +60,24 @@ const FeaturedProperties = () => {
     };
 
     fetchProperties();
-  }, []);
+  }, [searchResults]);
 
   const filteredProperties = useMemo(() => {
+    const sourceProperties = searchResults ? properties : properties;
+
     if (activeTab === 'all') {
-      return properties;
+      return sourceProperties;
     } else if (activeTab === 'featured') {
-      return properties.filter(p => p.is_featured);
+      return sourceProperties.filter(p => p.is_featured);
     } else if (activeTab === 'sale') {
-      return properties.filter(p => p.category === 'sale');
+      return sourceProperties.filter(p => p.category === 'sale');
     } else if (activeTab === 'rent') {
-      return properties.filter(p => p.category === 'rent');
+      return sourceProperties.filter(p => p.category === 'rent');
     } else if (activeTab === 'hot-deals') {
-      return properties.filter(p => p.is_hot_deal);
+      return sourceProperties.filter(p => p.is_hot_deal);
     }
     return [];
-  }, [activeTab, properties]);
+  }, [activeTab, properties, searchResults]);
 
   return (
     <section className="py-20 bg-gradient-to-br from-background to-muted/30">
@@ -74,10 +86,12 @@ const FeaturedProperties = () => {
         <div className="text-center mb-16">
           <div className="animate-fade-in">
             <h2 className="text-4xl font-bold text-foreground mb-4">
-              Featured Properties
+              {searchResults ? 'Search Results' : 'Featured Properties'}
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Discover our hand-picked selection of premium properties. From luxury homes to prime investment opportunities, find your perfect match.
+              {searchResults
+                ? `Found ${properties.length} properties matching your criteria.`
+                : 'Discover our hand-picked selection of premium properties. From luxury homes to prime investment opportunities, find your perfect match.'}
             </p>
           </div>
         </div>
@@ -118,14 +132,16 @@ const FeaturedProperties = () => {
               </div>
             ) : filteredProperties.length === 0 ? (
               <div className="text-center py-20">
-                <p className="text-muted-foreground text-lg">No properties found in this category.</p>
-                <Button
-                  variant="outline"
-                  className="mt-4"
-                  onClick={() => setActiveTab('all')}
-                >
-                  View All Properties
-                </Button>
+                <p className="text-muted-foreground text-lg">No properties found.</p>
+                {searchResults && (
+                  <Button
+                    variant="outline"
+                    className="mt-4"
+                    onClick={() => window.location.reload()} // A simple way to reset the search
+                  >
+                    Clear Search & View All
+                  </Button>
+                )}
               </div>
             ) : (
               <>
@@ -162,16 +178,18 @@ const FeaturedProperties = () => {
                 </div>
 
                 {/* View All Button */}
-                <div className="text-center animate-fade-in">
-                  <Button
-                    className="btn-hero hover:scale-105 transition-transform"
-                    onClick={() => setActiveTab('all')}
-                    size="lg"
-                  >
-                    View All
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                </div>
+                {!searchResults && (
+                  <div className="text-center animate-fade-in">
+                    <Button
+                      className="btn-hero hover:scale-105 transition-transform"
+                      onClick={() => setActiveTab('all')}
+                      size="lg"
+                    >
+                      View All
+                      <ArrowRight className="ml-2 h-5 w-5" />
+                    </Button>
+                  </div>
+                )}
               </>
             )}
           </TabsContent>
