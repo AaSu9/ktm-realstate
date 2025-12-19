@@ -51,8 +51,8 @@ const Admin = () => {
     if (error) console.error('Error updating status:', error);
   };
 
-  const handleToggleFeatured = async (id: string, featured: boolean) => {
-    const { error } = await supabase.from('properties').update({ featured }).eq('id', id);
+  const handleToggleFeatured = async (id: string, is_featured: boolean) => {
+    const { error } = await supabase.from('properties').update({ is_featured }).eq('id', id);
     if (error) console.error('Error updating featured:', error);
   };
 
@@ -152,7 +152,7 @@ const Admin = () => {
       )}
 
       {currentTab === 'inquiries' && (
-        <InquiriesList inquiries={inquiries} loading={loading} />
+        <InquiriesList loading={loading} />
       )}
       
       {currentTab === 'contact' && (

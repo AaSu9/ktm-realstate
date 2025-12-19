@@ -17,7 +17,7 @@ interface Property {
   bathrooms?: number;
   area_sqft?: number;
   property_type: string;
-  status: string;
+  status?: string;
   is_featured?: boolean;
   is_hot_deal?: boolean;
   discount_percentage?: number;

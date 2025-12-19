@@ -32,7 +32,8 @@ const AdminTestimonials = () => {
 
   const handleSave = async (testimonial: Testimonial | null) => {
     if (!testimonial) return;
-    const { error } = await supabase.from('testimonials').update(testimonial).eq('id', testimonial.id);
+    const { id, ...updateData } = testimonial;
+    const { error } = await supabase.from('testimonials').update(updateData).eq('id', id);
     if (error) {
       toast({ title: 'Error', description: 'Could not save testimonial.', variant: 'destructive' });
     } else {
