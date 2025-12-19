@@ -10,9 +10,7 @@ import { useState, useEffect } from 'react';
 import { 
   Phone, 
   MessageCircle, 
-  Mail, 
   MapPin, 
-  Clock, 
   Send,
   Facebook,
   Instagram,
@@ -20,14 +18,12 @@ import {
 } from 'lucide-react';
 
 interface ContactDetails {
-  phone: string;
-  whatsapp: string;
-  email: string;
-  address: string;
-  facebook: string;
-  instagram: string;
-  youtube: string;
-  business_hours: { [key: string]: string };
+  phone: string | null;
+  whatsapp: string | null;
+  address: string | null;
+  facebook: string | null;
+  instagram: string | null;
+  youtube: string | null;
 }
 
 const Contact = () => {
@@ -48,14 +44,14 @@ const Contact = () => {
       setLoading(true);
       const { data, error } = await supabase
         .from('contacts')
-        .select('*')
+        .select('phone, whatsapp, address, facebook, instagram, youtube')
         .single();
 
       if (error && error.code !== 'PGRST116') {
         console.error('Error fetching contact details:', error);
         toast({ title: 'Error', description: 'Could not load contact information.', variant: 'destructive' });
-      } else {
-        setContactDetails(data as ContactDetails);
+      } else if (data) {
+        setContactDetails(data);
       }
       setLoading(false);
     };
@@ -102,7 +98,7 @@ const Contact = () => {
         `Property Interest: ${formData.propertyInterest}\n` +
         `Message: ${formData.message}`
       );
-      window.location.href = `mailto:${contactDetails?.email}?subject=${subject}&body=${body}`;
+      // Form submitted successfully, inquiry saved to database
 
       toast({ title: "Message Sent!", description: "We'll get back to you soon." });
       setFormData({ fullName: '', phone: '', email: '', propertyInterest: '', message: '' });
@@ -118,30 +114,23 @@ const Contact = () => {
     {
       icon: Phone,
       title: 'Call Us',
-      details: contactDetails.phone,
+      details: contactDetails.phone || 'Not available',
       subtitle: 'Mon-Sun: 7:00 AM - 8:00 PM',
       action: handleCall
     },
     {
       icon: MessageCircle,
       title: 'WhatsApp',
-      details: `+${contactDetails.whatsapp}`,
+      details: contactDetails.whatsapp ? `+${contactDetails.whatsapp}` : 'Not available',
       subtitle: 'Quick response guaranteed',
       action: handleWhatsApp
     },
     {
-      icon: Mail,
-      title: 'Email',
-      details: contactDetails.email,
-      subtitle: 'We reply within 2 hours',
-      action: () => window.location.href = `mailto:${contactDetails.email}`
-    },
-    {
       icon: MapPin,
       title: 'Get Directions',
-      details: contactDetails.address,
+      details: contactDetails.address || 'Not available',
       subtitle: 'Visit us for consultation',
-      action: () => window.open(`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(contactDetails.address)}`, '_blank')
+      action: () => contactDetails.address && window.open(`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(contactDetails.address)}`, '_blank')
     }
   ] : [];
 
@@ -236,7 +225,7 @@ const Contact = () => {
                     <Facebook className="h-4 w-4 mr-2" /> Facebook
                   </Button>
                   <Button variant="outline" size="sm" className="flex-1" onClick={() => window.open(contactDetails?.instagram, '_blank')} disabled={!contactDetails?.instagram}>
-                    <Instagram className_="h-4 w-4 mr-2" /> Instagram
+                    <Instagram className="h-4 w-4 mr-2" /> Instagram
                   </Button>
                   <Button variant="outline" size="sm" className="flex-1" onClick={() => window.open(contactDetails?.youtube, '_blank')} disabled={!contactDetails?.youtube}>
                     <Youtube className="h-4 w-4 mr-2" /> YouTube
@@ -245,24 +234,6 @@ const Contact = () => {
               </CardContent>
             </Card>
 
-            {contactDetails?.business_hours &&
-              <Card className="property-card">
-                <CardContent className="p-6">
-                  <div className="flex items-center space-x-3 mb-4">
-                    <Clock className="h-6 w-6 text-accent" />
-                    <h4 className="text-lg font-semibold text-foreground">Office Hours</h4>
-                  </div>
-                  <div className="space-y-2 text-sm">
-                    {Object.entries(contactDetails.business_hours).map(([day, time]) => (
-                      <div key={day} className="flex justify-between">
-                        <span className="text-muted-foreground">{day}:</span>
-                        <span className="text-foreground font-medium">{time}</span>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            }
           </div>
         </div>
       </div>

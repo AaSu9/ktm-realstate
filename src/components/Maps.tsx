@@ -1,4 +1,4 @@
-'''import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
 import { MapPin, ExternalLink } from 'lucide-react';
@@ -50,7 +50,7 @@ const Maps = () => {
             Visit Our Office
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Come meet our team in person. We\'re located in the heart of Kathmandu, ready to help you find your perfect property.
+            Come meet our team in person. We're located in the heart of Kathmandu, ready to help you find your perfect property.
           </p>
         </div>
 
@@ -117,7 +117,7 @@ const Maps = () => {
               </CardContent>
             </Card>
 
-            {/* Business Hours (keeping it static as it\'s not in DB) */}
+            {/* Business Hours */}
             <Card className="property-card">
               <CardContent className="p-6">
                 <h3 className="text-xl font-semibold text-foreground mb-4">
@@ -171,4 +171,4 @@ const Maps = () => {
   );
 };
 
-export default Maps;'''
+export default Maps;

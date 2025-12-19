@@ -31,7 +31,8 @@ const AdminValues = () => {
 
   const handleSave = async (value: CompanyValue | null) => {
     if (!value) return;
-    const { error } = await supabase.from('company_values').update(value).eq('id', value.id);
+    const { id, ...updateData } = value;
+    const { error } = await supabase.from('company_values').update(updateData).eq('id', id);
     if (error) {
       toast({ title: 'Error', description: 'Could not save value.', variant: 'destructive' });
     } else {

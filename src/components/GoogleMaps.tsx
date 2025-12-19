@@ -1,21 +1,14 @@
-'use client';
-
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
-import { MapPin, Navigation, Phone, MessageCircle, Mail } from 'lucide-react';
+import { MapPin, Navigation, Phone, MessageCircle } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 
 interface ContactDetails {
-  address: string;
-  phone: string;
-  whatsapp: string;
-  email: string;
-  map_lat?: number;
-  map_lng?: number;
-  map_zoom?: number;
-  business_hours?: { [key: string]: string };
+  address: string | null;
+  phone: string | null;
+  whatsapp: string | null;
 }
 
 const GoogleMaps = () => {
@@ -28,14 +21,14 @@ const GoogleMaps = () => {
       setLoading(true);
       const { data, error } = await supabase
         .from('contacts')
-        .select('*')
+        .select('address, phone, whatsapp')
         .single();
 
       if (error && error.code !== 'PGRST116') {
         console.error('Error fetching contact details:', error);
         toast({ title: 'Error', description: 'Could not load map information.', variant: 'destructive' });
-      } else {
-        setContactDetails(data as ContactDetails);
+      } else if (data) {
+        setContactDetails(data);
       }
       setLoading(false);
     };
@@ -63,13 +56,6 @@ const GoogleMaps = () => {
     window.open(`https://wa.me/${contactDetails.whatsapp}?text=${message}`, '_blank');
   };
 
-  const handleEmail = () => {
-    if (!contactDetails?.email) return;
-    const subject = encodeURIComponent('Real Estate Inquiry');
-    const body = encodeURIComponent('Hi,\n\nI am interested in your real estate services. Please contact me.\n\nBest regards');
-    window.location.href = `mailto:${contactDetails.email}?subject=${subject}&body=${body}`;
-  };
-
   if (loading) {
     return <div className="py-20 text-center">Loading Map...</div>;
   }
@@ -85,9 +71,8 @@ const GoogleMaps = () => {
     );
   }
 
-  const canDisplayMap = contactDetails.map_lat && contactDetails.map_lng && contactDetails.map_zoom;
-  const mapEmbedUrl = canDisplayMap 
-    ? `https://maps.google.com/maps?q=${contactDetails.map_lat},${contactDetails.map_lng}&z=${contactDetails.map_zoom}&output=embed`
+  const mapEmbedUrl = contactDetails.address 
+    ? `https://maps.google.com/maps?q=${encodeURIComponent(contactDetails.address)}&output=embed`
     : '';
 
   return (
@@ -102,7 +87,7 @@ const GoogleMaps = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
           <div className="space-y-6">
-            {canDisplayMap && (
+            {contactDetails.address && (
               <Card className="overflow-hidden">
                 <CardContent className="p-0">
                   <div className="w-full h-96">
@@ -138,40 +123,21 @@ const GoogleMaps = () => {
                   </div>
                   <div>
                     <h3 className="text-lg font-semibold mb-2">Office Address</h3>
-                    <p className="text-muted-foreground whitespace-pre-line">{contactDetails.address}</p>
+                    <p className="text-muted-foreground whitespace-pre-line">{contactDetails.address || 'Not available'}</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
-
-            {contactDetails.business_hours && 
-              <Card className="property-card">
-                <CardContent className="p-6">
-                  <h3 className="text-lg font-semibold mb-4">Business Hours</h3>
-                  <div className="space-y-2">
-                    {Object.entries(contactDetails.business_hours).map(([day, time]) => (
-                      <div key={day} className="flex justify-between">
-                        <span className="text-muted-foreground">{day}</span>
-                        <span className="font-medium">{time as string}</span>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            }
 
             <Card className="property-card">
               <CardContent className="p-6">
                 <h3 className="text-lg font-semibold mb-4">Quick Contact</h3>
                 <div className="space-y-3">
                   <Button onClick={handleCall} className="w-full btn-primary flex items-center gap-2" disabled={!contactDetails.phone}>
-                    <Phone className="h-4 w-4" /> Call Now: {contactDetails.phone}
+                    <Phone className="h-4 w-4" /> Call Now: {contactDetails.phone || 'Not available'}
                   </Button>
                   <Button onClick={handleWhatsApp} variant="outline" className="w-full flex items-center gap-2" disabled={!contactDetails.whatsapp}>
                     <MessageCircle className="h-4 w-4" /> WhatsApp Business
-                  </Button>
-                  <Button onClick={handleEmail} variant="outline" className="w-full flex items-center gap-2" disabled={!contactDetails.email}>
-                    <Mail className="h-4 w-4" /> Send Email
                   </Button>
                 </div>
               </CardContent>

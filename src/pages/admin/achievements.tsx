@@ -31,7 +31,8 @@ const AdminAchievements = () => {
 
   const handleSave = async (achievement: Achievement | null) => {
     if (!achievement) return;
-    const { error } = await supabase.from('achievements').update(achievement).eq('id', achievement.id);
+    const { id, ...updateData } = achievement;
+    const { error } = await supabase.from('achievements').update(updateData).eq('id', id);
     if (error) {
       toast({ title: 'Error', description: 'Could not save achievement.', variant: 'destructive' });
     } else {

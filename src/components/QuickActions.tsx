@@ -10,7 +10,6 @@ import { useToast } from '@/hooks/use-toast';
 interface QuickContactDetails {
   phone: string | null;
   whatsapp: string | null;
-  email: string | null;
   address: string | null;
 }
 
@@ -24,7 +23,7 @@ const QuickActions = () => {
       setLoading(true);
       const { data, error } = await supabase
         .from('contacts')
-        .select('phone, whatsapp, email, address')
+        .select('phone, whatsapp, address')
         .single();
 
       if (error && error.code !== 'PGRST116') {
@@ -67,10 +66,9 @@ const QuickActions = () => {
   };
 
   const handleEmail = () => {
-    if (!contactDetails?.email) return;
     const subject = encodeURIComponent('Real Estate Inquiry from Website');
     const body = encodeURIComponent('Hi,\n\nI am interested in your real estate services. Please contact me to discuss my requirements.\n\nBest regards');
-    window.location.href = `mailto:${contactDetails.email}?subject=${subject}&body=${body}`;
+    window.location.href = `mailto:info@ktmrealstate.com?subject=${subject}&body=${body}`;
   };
 
   const handleLocation = () => {
@@ -105,7 +103,7 @@ const QuickActions = () => {
       label: 'Email Us',
       action: handleEmail,
       className: 'bg-blue-600 hover:bg-blue-700 text-white',
-      disabled: !contactDetails?.email,
+      disabled: false,
     },
     {
       icon: MapPin,
