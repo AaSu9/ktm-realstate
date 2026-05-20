@@ -21,6 +21,7 @@ interface Property {
   discount_percentage: number;
   category: string;
   status?: string;
+  created_at: string;
 }
 
 interface PropertySearchProps {

@@ -14,6 +14,84 @@ export type Database = {
   }
   public: {
     Tables: {
+      achievements: {
+        Row: {
+          icon: string | null
+          id: number
+          label: string
+          value: string
+        }
+        Insert: {
+          icon?: string | null
+          id?: never
+          label: string
+          value: string
+        }
+        Update: {
+          icon?: string | null
+          id?: never
+          label?: string
+          value?: string
+        }
+        Relationships: []
+      }
+      company_values: {
+        Row: {
+          description: string
+          icon: string | null
+          id: number
+          title: string
+        }
+        Insert: {
+          description: string
+          icon?: string | null
+          id?: never
+          title: string
+        }
+        Update: {
+          description?: string
+          icon?: string | null
+          id?: never
+          title?: string
+        }
+        Relationships: []
+      }
+      contacts: {
+        Row: {
+          address: string | null
+          facebook: string | null
+          id: number
+          instagram: string | null
+          phone: string | null
+          whatsapp: string | null
+          youtube: string | null
+          youtube_api_key: string | null
+          youtube_channel_id: string | null
+        }
+        Insert: {
+          address?: string | null
+          facebook?: string | null
+          id?: number
+          instagram?: string | null
+          phone?: string | null
+          whatsapp?: string | null
+          youtube?: string | null
+          youtube_api_key?: string | null
+          youtube_channel_id?: string | null
+        }
+        Update: {
+          address?: string | null
+          facebook?: string | null
+          id?: number
+          instagram?: string | null
+          phone?: string | null
+          whatsapp?: string | null
+          youtube?: string | null
+          youtube_api_key?: string | null
+          youtube_channel_id?: string | null
+        }
+        Relationships: []
+      }
       inquiries: {
         Row: {
           created_at: string
@@ -136,6 +214,51 @@ export type Database = {
           updated_at?: string
           video_url?: string | null
           youtube_url?: string | null
+        }
+        Relationships: []
+      }
+      stats: {
+        Row: {
+          happy_clients: number | null
+          id: number
+          properties_listed: number | null
+          years_experience: number | null
+        }
+        Insert: {
+          happy_clients?: number | null
+          id?: never
+          properties_listed?: number | null
+          years_experience?: number | null
+        }
+        Update: {
+          happy_clients?: number | null
+          id?: never
+          properties_listed?: number | null
+          years_experience?: number | null
+        }
+        Relationships: []
+      }
+      testimonials: {
+        Row: {
+          comment: string
+          id: number
+          name: string
+          rating: number | null
+          role: string | null
+        }
+        Insert: {
+          comment: string
+          id?: never
+          name: string
+          rating?: number | null
+          role?: string | null
+        }
+        Update: {
+          comment?: string
+          id?: never
+          name?: string
+          rating?: number | null
+          role?: string | null
         }
         Relationships: []
       }
