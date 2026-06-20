@@ -9,12 +9,16 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/favicon.ico",
-      "sizes": "48x48",
-      "type": "image/x-icon"
+      "src": "/logo.png?v=3",
+      "sizes": "192x192",
+      "type": "image/png"
     }
   ],
-  "categories": ["business", "real-estate", "shopping"],
+  "categories": [
+    "business",
+    "real-estate",
+    "shopping"
+  ],
   "scope": "/",
   "lang": "en"
 }

@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import Newsletter from '@/components/Newsletter';
+import { BrandLogo } from '@/components/BrandLogo';
 import { supabase } from '@/integrations/supabase/client';
 import { useState, useEffect } from 'react';
 import { 
@@ -53,14 +54,14 @@ const Footer = () => {
   const locations = ['Kathmandu', 'Bhaktapur', 'Lalitpur', 'Pokhara', 'Butwal', 'Chitwan'];
 
   return (
-    <footer className="bg-primary text-primary-foreground">
+    <footer className="bg-[#1B3A1F] text-primary-foreground border-t-4 border-accent">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Info */}
           <div className="lg:col-span-1">
-            <h3 className="text-2xl font-bold bg-accent-gradient bg-clip-text text-transparent mb-4">
-              KTM Realstate
-            </h3>
+            <div className="mb-6">
+              <BrandLogo />
+            </div>
             <p className="text-primary-foreground/80 mb-6 leading-relaxed">
               Your trusted partner in Nepal's real estate market. Making property dreams come true since 2008.
             </p>
@@ -113,14 +114,6 @@ const Footer = () => {
             <h4 className="text-lg font-semibold mb-6">Stay Updated</h4>
             <p className="text-primary-foreground/80 mb-4">Get the latest listings and market updates.</p>
             <Newsletter />
-            <div className="mt-6">
-              <h5 className="font-medium mb-3">Popular Locations</h5>
-              <div className="flex flex-wrap gap-2">
-                {locations.map((location) => (
-                  <span key={location} className="px-2 py-1 bg-primary-foreground/10 rounded text-xs text-primary-foreground/80 hover:bg-accent hover:text-accent-foreground cursor-pointer transition-colors" onClick={() => window.open(`https://www.google.com/maps/search/properties+in+${location}+Nepal`, '_blank')}>{location}</span>
-                ))}
-              </div>
-            </div>
           </div>
         </div>
 

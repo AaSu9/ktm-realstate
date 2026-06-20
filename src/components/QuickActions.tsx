@@ -16,128 +16,49 @@ interface QuickContactDetails {
 const QuickActions = () => {
   const { toast } = useToast();
   const [contactDetails, setContactDetails] = useState<QuickContactDetails | null>(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchContactDetails = async () => {
-      setLoading(true);
       const { data, error } = await supabase
         .from('contacts')
         .select('phone, whatsapp, address')
         .single();
 
-      if (error && error.code !== 'PGRST116') {
-        console.error('Error fetching quick contact details:', error);
-      } else {
+      if (!error && data) {
         setContactDetails(data);
       }
-      setLoading(false);
     };
 
     fetchContactDetails();
   }, []);
 
-  const handleCall = () => {
-    if (!contactDetails?.phone) return;
-    window.location.href = `tel:${contactDetails.phone}`;
-  };
-
-  const handleWhatsApp = async () => {
+  const handleWhatsApp = () => {
     if (!contactDetails?.whatsapp) return;
-    
-    try {
-      await supabase.functions.invoke('whatsapp-send', {
-        body: {
-          to: contactDetails.whatsapp,
-          message: 'Hi! I am interested in your real estate services. Can you help me find a property?'
-        }
-      });
-      
-      toast({
-        title: "WhatsApp Message Sent!",
-        description: "We'll respond to you shortly.",
-      });
-    } catch (error) {
-      console.error('WhatsApp function failed, using fallback:', error);
-      const message = encodeURIComponent('Hi! I am interested in your real estate services. Can you help me find a property?');
-      const whatsappUrl = `https://wa.me/${contactDetails.whatsapp}?text=${message}`;
-      window.open(whatsappUrl, '_blank');
-    }
+    const message = encodeURIComponent('Hi! I am interested in your real estate services. Can you help me find a property?');
+    const whatsappUrl = `https://wa.me/${contactDetails.whatsapp}?text=${message}`;
+    window.open(whatsappUrl, '_blank');
   };
-
-  const handleEmail = () => {
-    const subject = encodeURIComponent('Real Estate Inquiry from Website');
-    const body = encodeURIComponent('Hi,\n\nI am interested in your real estate services. Please contact me to discuss my requirements.\n\nBest regards');
-    window.location.href = `mailto:info@ktmrealstate.com?subject=${subject}&body=${body}`;
-  };
-
-  const handleLocation = () => {
-    const mapsSection = document.querySelector('#maps');
-    if (mapsSection) {
-      mapsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-    if (contactDetails?.address) {
-        setTimeout(() => {
-            window.open(`https://maps.google.com/?q=${encodeURIComponent(contactDetails.address)}`, '_blank');
-        }, 1000);
-    }
-  };
-
-  const quickActions = [
-    {
-      icon: Phone,
-      label: 'Call Now',
-      action: handleCall,
-      className: 'btn-primary',
-      disabled: !contactDetails?.phone,
-    },
-    {
-      icon: MessageCircle,
-      label: 'WhatsApp',
-      action: handleWhatsApp,
-      className: 'bg-green-600 hover:bg-green-700 text-white',
-      disabled: !contactDetails?.whatsapp,
-    },
-    {
-      icon: Mail,
-      label: 'Email Us',
-      action: handleEmail,
-      className: 'bg-blue-600 hover:bg-blue-700 text-white',
-      disabled: false,
-    },
-    {
-      icon: MapPin,
-      label: 'Visit Office',
-      action: handleLocation,
-      className: 'bg-purple-600 hover:bg-purple-700 text-white',
-      disabled: !contactDetails?.address,
-    }
-  ];
-  
-  if (loading || !contactDetails) {
-    return null;
-  }
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 hidden md:block">
-      <Card className="property-card">
-        <CardContent className="p-4">
-          <div className="flex flex-col gap-2">
-            {quickActions.map((action) => (
-              <Button
-                key={action.label}
-                size="sm"
-                className={action.className}
-                onClick={action.action}
-                disabled={action.disabled || loading}
-              >
-                <action.icon className="h-4 w-4 mr-2" />
-                {action.label}
-              </Button>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+    <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3">
+      {contactDetails?.phone && (
+        <Button
+          size="icon"
+          className="h-14 w-14 rounded-full bg-accent hover:bg-accent-hover text-white shadow-lg hover:scale-110 transition-transform"
+          onClick={() => window.location.href = `tel:${contactDetails.phone}`}
+        >
+          <Phone className="h-6 w-6" />
+        </Button>
+      )}
+      {contactDetails?.whatsapp && (
+        <Button
+          className="h-14 px-6 rounded-full bg-accent hover:bg-accent-hover text-white shadow-lg hover:scale-110 transition-transform flex items-center gap-2 text-lg font-bold"
+          onClick={handleWhatsApp}
+        >
+          <MessageCircle className="h-6 w-6" />
+          WhatsApp
+        </Button>
+      )}
     </div>
   );
 };

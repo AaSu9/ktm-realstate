@@ -1,13 +1,13 @@
 import Navigation from '@/components/Navigation';
 import Hero from '@/components/Hero';
 import FeaturedProperties from '@/components/FeaturedProperties';
-import Services from '@/components/Services';
+import WhyChooseUs from '@/components/WhyChooseUs';
+import Testimonials from '@/components/Testimonials';
+import CtaBanner from '@/components/CtaBanner';
 import About from '@/components/About';
-import GoogleMaps from '@/components/GoogleMaps';
 import Contact from '@/components/Contact';
 import Footer from '@/components/Footer';
 import QuickActions from '@/components/QuickActions';
-import YouTube from '@/components/Youtube';
 import { useState } from 'react';
 
 interface Property {
@@ -26,6 +26,7 @@ interface Property {
   category: string;
   status?: string;
   created_at: string;
+  property_id?: string;
 }
 
 const Index = () => {
@@ -41,17 +42,17 @@ const Index = () => {
         <section id="properties">
           <FeaturedProperties searchResults={searchResults} />
         </section>
-        <section id="services">
-          <Services />
+        <section id="why-us">
+          <WhyChooseUs />
+        </section>
+        <section id="testimonials">
+          <Testimonials />
         </section>
         <section id="about">
           <About />
         </section>
-        <section id="maps">
-          <GoogleMaps />
-        </section>
-        <section id="youtube">
-          <YouTube />
+        <section id="cta">
+          <CtaBanner />
         </section>
         <section id="contact">
           <Contact />

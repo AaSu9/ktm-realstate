@@ -6,6 +6,7 @@ import { MapPin, Bed, Bath, Square, Phone, MessageCircle, Mail, Calendar, Star, 
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import EMICalculator from '@/components/EMICalculator';
 
 interface Property {
   id: string;
@@ -28,6 +29,7 @@ interface Property {
   youtube_url?: string;
   tiktok_url?: string;
   created_at: string;
+  property_id?: string;
 }
 
 interface PropertyDetailsModalProps {
@@ -206,10 +208,15 @@ const PropertyDetailsModal = ({ property, isOpen, onClose }: PropertyDetailsModa
               </div>
 
               <div className="flex gap-2">
-                <Badge variant="outline">{property.property_type}</Badge>
+                {property.property_id && (
+                  <Badge className="bg-secondary text-secondary-foreground font-semibold">
+                    ID: {property.property_id}
+                  </Badge>
+                )}
                 <Badge variant={property.category === 'sale' ? 'default' : 'secondary'}>
                   For {property.category === 'sale' ? 'Sale' : 'Rent'}
                 </Badge>
+                <Badge variant="outline">{property.property_type}</Badge>
                 <Badge variant={property.status === 'available' ? 'default' : 'destructive'}>
                   {property.status}
                 </Badge>
@@ -298,6 +305,13 @@ const PropertyDetailsModal = ({ property, isOpen, onClose }: PropertyDetailsModa
                   </Badge>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* EMI Calculator — only for sale properties */}
+          {property.category === 'sale' && property.price > 0 && (
+            <div className="space-y-2">
+              <EMICalculator propertyPrice={property.price} />
             </div>
           )}
 

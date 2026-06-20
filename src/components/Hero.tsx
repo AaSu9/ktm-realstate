@@ -52,21 +52,21 @@ const Hero = ({ onSearchResults }: HeroProps) => {
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: `url(${heroImage})` }}
       >
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/80 via-primary/60 to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/90 to-secondary/80 mix-blend-multiply"></div>
       </div>
 
       {/* Content */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="max-w-3xl">
           <div className="animate-fade-in">
-            <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">
+            <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-6 leading-tight drop-shadow-md">
               Find Your Perfect
-              <span className="block bg-accent-gradient bg-clip-text text-transparent">
-                Dream Home
+              <span className="block text-accent">
+                Dream Home in Nepal
               </span>
             </h1>
-            <p className="text-xl text-white/90 mb-8 leading-relaxed">
-              Discover premium properties in Nepal\'s most desirable locations. From luxury homes to prime land investments, we make your real estate dreams a reality.
+            <p className="text-xl text-white/95 mb-8 leading-relaxed font-medium drop-shadow-sm">
+              Discover premium properties in Imadol, Budhanilkantha, and Pepsicola. From luxury homes to prime land investments, we make your real estate dreams a reality.
             </p>
           </div>
 

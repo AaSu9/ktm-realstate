@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Menu, X, Phone, MessageCircle } from 'lucide-react';
+import { Menu, X, PlusCircle } from 'lucide-react';
+import { BrandLogo } from './BrandLogo';
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -8,9 +9,9 @@ const Navigation = () => {
   const menuItems = [
     { name: 'Home', href: '#home' },
     { name: 'Properties', href: '#properties' },
-    { name: 'Services', href: '#services' },
     { name: 'About', href: '#about' },
-    { name: 'Location', href: '#maps' },
+    { name: 'Agents', href: '#agents' },
+    { name: 'Blog', href: '#blog' },
     { name: 'Contact', href: '#contact' },
   ];
 
@@ -30,10 +31,8 @@ const Navigation = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <div className="flex-shrink-0">
-            <h1 className="text-2xl font-bold bg-accent-gradient bg-clip-text text-transparent">
-              KTM Realstate
-            </h1>
+          <div className="flex-shrink-0 cursor-pointer" onClick={() => scrollToSection('#home')}>
+            <BrandLogo />
           </div>
 
           {/* Desktop Menu */}
@@ -54,20 +53,11 @@ const Navigation = () => {
           {/* Contact Buttons */}
           <div className="hidden md:flex items-center space-x-4">
             <Button 
-              variant="outline" 
-              size="sm" 
-              className="flex items-center gap-2"
-              onClick={() => window.location.href = 'tel:+9779741690374'}
+              className="bg-accent hover:bg-accent-hover text-white font-semibold flex items-center gap-2 rounded-xl shadow-md transition-all hover:-translate-y-0.5"
+              onClick={() => window.location.href = '#contact'}
             >
-              <Phone className="h-4 w-4" />
-              Call Us
-            </Button>
-            <Button 
-              className="btn-primary flex items-center gap-2"
-              onClick={() => window.open('https://wa.me/9779741690374', '_blank')}
-            >
-              <MessageCircle className="h-4 w-4" />
-              WhatsApp
+              <PlusCircle className="h-4 w-4" />
+              List Your Property
             </Button>
           </div>
 
@@ -100,20 +90,14 @@ const Navigation = () => {
             <div className="pt-4 pb-3 border-t border-border">
               <div className="flex flex-col space-y-2 px-3">
                 <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="flex items-center gap-2 justify-center"
-                  onClick={() => window.location.href = 'tel:+9779741690374'}
+                  className="bg-accent hover:bg-accent-hover text-white font-semibold flex items-center gap-2 justify-center rounded-xl w-full shadow-md"
+                  onClick={() => {
+                    scrollToSection('#contact');
+                    setIsOpen(false);
+                  }}
                 >
-                  <Phone className="h-4 w-4" />
-                  Call Us
-                </Button>
-                <Button 
-                  className="btn-primary flex items-center gap-2 justify-center"
-                  onClick={() => window.open('https://wa.me/9779741690374', '_blank')}
-                >
-                  <MessageCircle className="h-4 w-4" />
-                  WhatsApp
+                  <PlusCircle className="h-4 w-4" />
+                  List Your Property
                 </Button>
               </div>
             </div>

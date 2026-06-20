@@ -157,6 +157,7 @@ export type Database = {
           location: string
           longitude: number | null
           price: number
+          property_id: string
           property_type: string
           status: string | null
           tiktok_url: string | null
@@ -182,6 +183,7 @@ export type Database = {
           location: string
           longitude?: number | null
           price: number
+          property_id: string
           property_type: string
           status?: string | null
           tiktok_url?: string | null
@@ -207,6 +209,7 @@ export type Database = {
           location?: string
           longitude?: number | null
           price?: number
+          property_id?: string
           property_type?: string
           status?: string | null
           tiktok_url?: string | null

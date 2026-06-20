@@ -22,6 +22,7 @@ interface Property {
   category: string;
   status?: string;
   created_at: string;
+  property_id?: string;
 }
 
 interface PropertyCardProps {
@@ -87,6 +88,14 @@ const PropertyCard = ({
         
         {/* Badges */}
         <div className="absolute top-4 left-4 flex flex-wrap gap-2">
+          {property.property_id && (
+            <Badge className="bg-secondary text-secondary-foreground font-semibold">
+              ID: {property.property_id}
+            </Badge>
+          )}
+          <Badge className="bg-primary hover:bg-primary-hover text-white font-semibold">
+            For {type === 'sale' ? 'Sale' : 'Rent'}
+          </Badge>
           {featured && (
             <Badge className="bg-accent text-accent-foreground font-semibold">
               Featured
@@ -97,9 +106,6 @@ const PropertyCard = ({
               {discount}
             </Badge>
           )}
-          <Badge variant={type === 'sale' ? 'default' : 'secondary'} className="font-semibold">
-            For {type === 'sale' ? 'Sale' : 'Rent'}
-          </Badge>
         </div>
 
         {/* Like Button */}
@@ -114,7 +120,7 @@ const PropertyCard = ({
 
         {/* Price Overlay */}
         <div className="absolute bottom-4 left-4">
-          <div className="bg-primary/90 text-primary-foreground px-3 py-1 rounded-lg font-bold">
+          <div className="bg-accent text-white px-3 py-1 rounded-lg font-bold shadow-md">
             {price}
           </div>
         </div>

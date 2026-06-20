@@ -31,6 +31,7 @@ interface Property {
   video_url?: string;
   youtube_url?: string;
   tiktok_url?: string;
+  property_id?: string;
 }
 
 interface PropertyFormProps {
@@ -64,6 +65,7 @@ const PropertyForm = ({ property, onSubmit, onCancel }: PropertyFormProps) => {
     video_url: '',
     youtube_url: '',
     tiktok_url: '',
+    property_id: '',
   });
 
   useEffect(() => {
@@ -87,6 +89,7 @@ const PropertyForm = ({ property, onSubmit, onCancel }: PropertyFormProps) => {
         video_url: property.video_url || '',
         youtube_url: property.youtube_url || '',
         tiktok_url: property.tiktok_url || '',
+        property_id: property.property_id || '',
       });
     } else {
       setFormData({
@@ -108,6 +111,7 @@ const PropertyForm = ({ property, onSubmit, onCancel }: PropertyFormProps) => {
         video_url: '',
         youtube_url: '',
         tiktok_url: '',
+        property_id: '',
       });
     }
   }, [property]);
@@ -208,6 +212,16 @@ const PropertyForm = ({ property, onSubmit, onCancel }: PropertyFormProps) => {
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label htmlFor="property_id">Custom Property ID (Optional)</Label>
+              <Input
+                id="property_id"
+                value={formData.property_id}
+                onChange={(e) => setFormData(prev => ({ ...prev, property_id: e.target.value }))}
+                placeholder="e.g., 1001"
+              />
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="title">Title *</Label>
               <Input
