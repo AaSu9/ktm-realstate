@@ -7,41 +7,46 @@ import { supabase } from '@/integrations/supabase/client';
 import { useState, useEffect } from 'react';
 import { 
   Phone, 
-  Mail, 
   MapPin, 
   Facebook, 
   Instagram, 
   Youtube,
-  MessageCircle
+  MessageCircle,
+  Building2
 } from 'lucide-react';
 
-interface ContactDetails {
-  phone: string;
-  address: string;
-  facebook: string;
-  instagram: string;
-  youtube: string;
-  whatsapp: string;
+interface ContactBranch {
+  id: number;
+  branch_name?: string | null;
+  phone: string | null;
+  address: string | null;
+  facebook: string | null;
+  instagram: string | null;
+  youtube: string | null;
+  whatsapp: string | null;
 }
 
 const Footer = () => {
-  const [contactDetails, setContactDetails] = useState<ContactDetails | null>(null);
+  const [branches, setBranches] = useState<ContactBranch[]>([]);
 
   useEffect(() => {
-    const fetchContactDetails = async () => {
+    const fetchBranches = async () => {
       const { data, error } = await supabase
         .from('contacts')
         .select('*')
-        .single();
+        .order('id', { ascending: true });
 
       if (error && error.code !== 'PGRST116') {
         console.error('Error fetching footer contact details:', error);
-      } else {
-        setContactDetails(data as unknown as ContactDetails);
+      } else if (data) {
+        setBranches(data as ContactBranch[]);
       }
     };
-    fetchContactDetails();
+    fetchBranches();
   }, []);
+
+  // Use the first branch for social media links
+  const primaryBranch = branches[0] ?? null;
 
   const quickLinks = [
     { name: 'Home', href: '#home' },
@@ -51,13 +56,12 @@ const Footer = () => {
     { name: 'Contact', href: '#contact' }
   ];
 
-  const locations = ['Kathmandu', 'Bhaktapur', 'Lalitpur', 'Pokhara', 'Butwal', 'Chitwan'];
-
   return (
     <footer className="bg-[#1B3A1F] text-primary-foreground border-t-4 border-accent">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {/* Company Info */}
+          
+          {/* Company Info + Branches */}
           <div className="lg:col-span-1">
             <div className="mb-6">
               <BrandLogo />
@@ -66,31 +70,56 @@ const Footer = () => {
               Your trusted partner in Nepal's real estate market. Making property dreams come true since 2008.
             </p>
             
-            {contactDetails && (
-              <div className="space-y-3">
-                <div className="flex items-center">
-                  <Phone className="h-5 w-5 text-accent mr-3" />
-                  <a href={`tel:${contactDetails.phone}`} className="hover:text-accent transition-colors">
-                    {contactDetails.phone}
-                  </a>
-                </div>
-                <div className="flex items-center">
-                  <MapPin className="h-5 w-5 text-accent mr-3" />
-                  <span>{contactDetails.address}</span>
-                </div>
+            {/* Multi-branch addresses */}
+            {branches.length > 0 && (
+              <div className="space-y-4 mb-6">
+                {branches.map((branch, idx) => (
+                  <div key={branch.id} className="space-y-1.5">
+                    {/* Branch label */}
+                    <div className="flex items-center gap-2">
+                      <Building2 className="h-4 w-4 text-accent flex-shrink-0" />
+                      <span className="text-accent text-sm font-semibold">
+                        {branch.branch_name || (idx === 0 ? 'Head Office' : `Branch ${idx + 1}`)}
+                      </span>
+                    </div>
+                    {branch.address && (
+                      <div className="flex items-start gap-2 pl-6">
+                        <MapPin className="h-4 w-4 text-primary-foreground/60 flex-shrink-0 mt-0.5" />
+                        <span className="text-primary-foreground/80 text-sm">{branch.address}</span>
+                      </div>
+                    )}
+                    {branch.phone && (
+                      <div className="flex items-center gap-2 pl-6">
+                        <Phone className="h-4 w-4 text-primary-foreground/60 flex-shrink-0" />
+                        <a href={`tel:${branch.phone}`} className="text-primary-foreground/80 text-sm hover:text-accent transition-colors">
+                          {branch.phone}
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                ))}
               </div>
             )}
 
-            <div className="flex space-x-3 mt-6">
-              <Button variant="outline" size="sm" className="border-accent text-accent hover:bg-accent hover:text-accent-foreground" onClick={() => window.open(contactDetails?.facebook, '_blank')} disabled={!contactDetails?.facebook}><Facebook className="h-4 w-4" /></Button>
-              <Button variant="outline" size="sm" className="border-accent text-accent hover:bg-accent hover:text-accent-foreground" onClick={() => window.open(contactDetails?.instagram, '_blank')} disabled={!contactDetails?.instagram}><Instagram className="h-4 w-4" /></Button>
-              <Button variant="outline" size="sm" className="border-accent text-accent hover:bg-accent hover:text-accent-foreground" onClick={() => window.open(contactDetails?.youtube, '_blank')} disabled={!contactDetails?.youtube}><Youtube className="h-4 w-4" /></Button>
-              <Button variant="outline" size="sm" className="border-green-500 text-green-500 hover:bg-green-500 hover:text-white" onClick={() => window.open(`https://wa.me/${contactDetails?.whatsapp}`, '_blank')} disabled={!contactDetails?.whatsapp}><MessageCircle className="h-4 w-4" /></Button>
+            {/* Social Media (from primary branch) */}
+            <div className="flex space-x-3">
+              <Button variant="outline" size="sm" className="border-accent text-accent hover:bg-accent hover:text-accent-foreground" onClick={() => window.open(primaryBranch?.facebook || '', '_blank')} disabled={!primaryBranch?.facebook}>
+                <Facebook className="h-4 w-4" />
+              </Button>
+              <Button variant="outline" size="sm" className="border-accent text-accent hover:bg-accent hover:text-accent-foreground" onClick={() => window.open(primaryBranch?.instagram || '', '_blank')} disabled={!primaryBranch?.instagram}>
+                <Instagram className="h-4 w-4" />
+              </Button>
+              <Button variant="outline" size="sm" className="border-accent text-accent hover:bg-accent hover:text-accent-foreground" onClick={() => window.open(primaryBranch?.youtube || '', '_blank')} disabled={!primaryBranch?.youtube}>
+                <Youtube className="h-4 w-4" />
+              </Button>
+              <Button variant="outline" size="sm" className="border-green-500 text-green-500 hover:bg-green-500 hover:text-white" onClick={() => window.open(`https://wa.me/${primaryBranch?.whatsapp}`, '_blank')} disabled={!primaryBranch?.whatsapp}>
+                <MessageCircle className="h-4 w-4" />
+              </Button>
             </div>
           </div>
 
-          {/* Quick Links, Property Types, Newsletter */}
-           <div>
+          {/* Quick Links */}
+          <div>
             <h4 className="text-lg font-semibold mb-6">Quick Links</h4>
             <ul className="space-y-3">
               {quickLinks.map((link) => (
@@ -101,15 +130,17 @@ const Footer = () => {
             </ul>
           </div>
 
+          {/* Property Types */}
           <div>
             <h4 className="text-lg font-semibold mb-6">Property Types</h4>
-             <ul className="space-y-3">
-                <li><a href="#properties" className="text-primary-foreground/80 hover:text-accent transition-colors duration-300">Houses for Sale</a></li>
-                <li><a href="#properties" className="text-primary-foreground/80 hover:text-accent transition-colors duration-300">Apartments</a></li>
-                <li><a href="#properties" className="text-primary-foreground/80 hover:text-accent transition-colors duration-300">Land & Plots</a></li>
-             </ul>
+            <ul className="space-y-3">
+              <li><a href="#properties" className="text-primary-foreground/80 hover:text-accent transition-colors duration-300">Houses for Sale</a></li>
+              <li><a href="#properties" className="text-primary-foreground/80 hover:text-accent transition-colors duration-300">Apartments</a></li>
+              <li><a href="#properties" className="text-primary-foreground/80 hover:text-accent transition-colors duration-300">Land & Plots</a></li>
+            </ul>
           </div>
 
+          {/* Newsletter */}
           <div>
             <h4 className="text-lg font-semibold mb-6">Stay Updated</h4>
             <p className="text-primary-foreground/80 mb-4">Get the latest listings and market updates.</p>
