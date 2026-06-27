@@ -156,6 +156,7 @@ export type Database = {
           latitude: number | null
           location: string
           longitude: number | null
+          map_url: string | null
           price: number
           property_id: string
           property_type: string
@@ -182,6 +183,7 @@ export type Database = {
           latitude?: number | null
           location: string
           longitude?: number | null
+          map_url?: string | null
           price: number
           property_id: string
           property_type: string
@@ -208,6 +210,7 @@ export type Database = {
           latitude?: number | null
           location?: string
           longitude?: number | null
+          map_url?: string | null
           price?: number
           property_id?: string
           property_type?: string

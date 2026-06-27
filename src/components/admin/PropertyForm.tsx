@@ -133,26 +133,56 @@ const PropertyForm = ({ property, onSubmit, onCancel }: PropertyFormProps) => {
 
     setLoading(true);
     try {
+      // Build explicit payload with only known Supabase columns
+      const payload = {
+        title: formData.title,
+        location: formData.location,
+        price: formData.price,
+        images: formData.images,
+        bedrooms: formData.bedrooms ?? null,
+        bathrooms: formData.bathrooms ?? null,
+        area_sqft: formData.area_sqft ?? null,
+        property_type: formData.property_type,
+        status: formData.status,
+        is_featured: formData.is_featured,
+        is_hot_deal: formData.is_hot_deal,
+        discount_percentage: formData.discount_percentage,
+        description: formData.description || null,
+        features: formData.features ?? [],
+        category: formData.category,
+        video_url: formData.video_url || null,
+        youtube_url: formData.youtube_url || null,
+        tiktok_url: formData.tiktok_url || null,
+        map_url: formData.map_url || null,
+        property_id: formData.property_id || '',
+      };
+
       if (property?.id) {
         // Update existing property
         const { error } = await supabase
           .from('properties')
-          .update(formData)
+          .update(payload)
           .eq('id', property.id);
 
-        if (error) throw error;
+        if (error) {
+          console.error('Supabase update error:', error);
+          throw new Error(error.message);
+        }
         toast({
           title: "Success",
           description: "Property updated successfully",
         });
       } else {
         // Create new property
-        const { data, error } = await supabase
+        const { error } = await supabase
           .from('properties')
-          .insert([formData])
+          .insert([payload])
           .select();
 
-        if (error) throw error;
+        if (error) {
+          console.error('Supabase insert error:', error);
+          throw new Error(error.message);
+        }
         toast({
           title: "Success",
           description: "Property created successfully",
@@ -160,11 +190,11 @@ const PropertyForm = ({ property, onSubmit, onCancel }: PropertyFormProps) => {
       }
 
       onSubmit();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving property:', error);
       toast({
         title: "Error",
-        description: "Failed to save property",
+        description: error?.message || "Failed to save property",
         variant: "destructive",
       });
     } finally {

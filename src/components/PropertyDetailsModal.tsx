@@ -125,30 +125,31 @@ const PropertyDetailsModal = ({ property, isOpen, onClose }: PropertyDetailsModa
     return `NPR ${price.toLocaleString()}`;
   };
 
-  const getMapEmbedUrl = (url: string, location: string) => {
-    if (url) {
-      // If it's a full iframe embed tag, extract the src
-      if (url.includes('<iframe') && url.includes('src=')) {
-        const match = url.match(/src="([^"]+)"/);
-        if (match) return match[1];
-      }
-      // If it's already a proper Google Maps embed URL, use directly
-      if (url.includes('google.com/maps/embed') || url.includes('maps.google.com/maps?')) {
-        return url;
-      }
-      // Otherwise (goo.gl, maps.app.goo.gl, normal maps link) — cannot be embedded
-      return null;
+  // Returns embed src ONLY if embeddable, null otherwise
+  const getEmbedSrc = (url: string): string | null => {
+    if (!url) return null;
+    // Full iframe tag — extract src
+    if (url.includes('<iframe') && url.includes('src=')) {
+      const match = url.match(/src="([^"]+)"/);
+      return match ? match[1] : null;
     }
-    // Fallback: generate embed from location text
-    if (location) {
-      return `https://maps.google.com/maps?q=${encodeURIComponent(location)}&t=&z=14&ie=UTF8&iwloc=&output=embed`;
+    // Direct embed URLs
+    if (url.includes('google.com/maps/embed') || url.includes('maps.google.com/maps?')) {
+      return url;
     }
+    // Short links (maps.app.goo.gl, goo.gl, etc.) — cannot be embedded
     return null;
   };
 
-  const isExternalMapsLink = (url: string) => {
+  // Returns true if the url is a regular/short link the user can open directly
+  const isOpenableLink = (url: string): boolean => {
     if (!url) return false;
-    return url.startsWith('http') && !url.includes('google.com/maps/embed') && !url.includes('maps.google.com/maps?') && !url.includes('<iframe');
+    return url.trim().startsWith('http') && getEmbedSrc(url) === null;
+  };
+
+  // Embed src to use when NO map_url is set — shows the area based on location text
+  const getLocationFallbackSrc = (location: string): string => {
+    return `https://maps.google.com/maps?q=${encodeURIComponent(location)}&t=&z=14&ie=UTF8&iwloc=&output=embed`;
   };
 
   return (
@@ -318,11 +319,16 @@ const PropertyDetailsModal = ({ property, isOpen, onClose }: PropertyDetailsModa
             <div className="space-y-3">
               <h3 className="text-lg font-semibold">Location Map</h3>
               {(() => {
-                const embedSrc = getMapEmbedUrl(property.map_url || '', property.location);
-                const showExternalLink = property.map_url && isExternalMapsLink(property.map_url);
+                const mapUrl = property.map_url || '';
+                const embedSrc = getEmbedSrc(mapUrl);
+                const canOpen = isOpenableLink(mapUrl);
+                // Only show location fallback if NO map_url was provided
+                const fallbackSrc = !mapUrl && property.location ? getLocationFallbackSrc(property.location) : null;
+
                 return (
                   <>
-                    {embedSrc ? (
+                    {/* Embeddable iframe — proper embed code */}
+                    {embedSrc && (
                       <div className="w-full h-[400px] rounded-lg overflow-hidden border">
                         <iframe 
                           src={embedSrc}
@@ -334,16 +340,33 @@ const PropertyDetailsModal = ({ property, isOpen, onClose }: PropertyDetailsModa
                           referrerPolicy="no-referrer-when-downgrade"
                         ></iframe>
                       </div>
-                    ) : null}
-                    {showExternalLink && (
+                    )}
+
+                    {/* Short/regular link — show button that opens EXACT location */}
+                    {canOpen && (
                       <a 
-                        href={property.map_url} 
+                        href={mapUrl}
                         target="_blank" 
                         rel="noopener noreferrer" 
-                        className="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors"
+                        className="inline-flex items-center gap-2 px-5 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold transition-colors shadow-sm"
                       >
                         <MapPin className="h-4 w-4" /> View Exact Location on Google Maps
                       </a>
+                    )}
+
+                    {/* No map_url at all — show area-level fallback from location text */}
+                    {fallbackSrc && (
+                      <div className="w-full h-[400px] rounded-lg overflow-hidden border">
+                        <iframe 
+                          src={fallbackSrc}
+                          width="100%" 
+                          height="100%" 
+                          style={{ border: 0 }} 
+                          allowFullScreen 
+                          loading="lazy" 
+                          referrerPolicy="no-referrer-when-downgrade"
+                        ></iframe>
+                      </div>
                     )}
                   </>
                 );
