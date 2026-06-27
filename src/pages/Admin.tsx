@@ -322,7 +322,7 @@ const Admin = () => {
 
             {currentTab === 'inquiries' && (
               <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 animate-in fade-in duration-500">
-                <InquiriesList loading={loading} />
+                <InquiriesList loading={loading} inquiries={inquiries} />
               </div>
             )}
             

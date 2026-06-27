@@ -100,7 +100,14 @@ const Contact = () => {
       );
       // Form submitted successfully, inquiry saved to database
 
-      toast({ title: "Message Sent!", description: "We'll get back to you soon." });
+      toast({ title: "Message Sent!", description: "Redirecting to WhatsApp to notify us..." });
+
+      // Open WhatsApp in a new tab (non-blocking)
+      const phone = contactDetails?.whatsapp || '9779741690374';
+      setTimeout(() => {
+        window.open(`https://wa.me/${phone}?text=${body}`, '_blank');
+      }, 1000);
+
       setFormData({ fullName: '', phone: '', email: '', propertyInterest: '', message: '' });
     } catch (error) {
       const err = error as { message: string };
