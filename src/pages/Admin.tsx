@@ -245,8 +245,16 @@ const Admin = () => {
                 onClick={() => {
                   setCurrentTab(item.id);
                   setSidebarOpen(false);
-                  // When clicking Inquiries, mark all 'new' as 'read' to clear the badge
+                  // When clicking Inquiries, optimistically clear badge immediately
+                  // and persist to Supabase in the background
                   if (item.id === 'inquiries' && newInquiriesCount > 0) {
+                    // Optimistic update: mark all locally as 'read' so badge clears instantly
+                    setInquiries((prev: any[]) =>
+                      prev.map((inq) =>
+                        inq.status === 'new' || !inq.status ? { ...inq, status: 'read' } : inq
+                      )
+                    );
+                    // Persist to Supabase in background
                     supabase
                       .from('inquiries')
                       .update({ status: 'read' })
