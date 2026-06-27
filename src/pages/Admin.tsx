@@ -35,19 +35,19 @@ const Admin = () => {
   const [currentTab, setCurrentTab] = useState('properties');
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  const fetchData = async () => {
+    const { data: propertiesData, error: propertiesError } = await supabase.from('properties').select('*').order('created_at', { ascending: false });
+    if (propertiesError) console.error('Error fetching properties:', propertiesError);
+    else setProperties(propertiesData);
+
+    const { data: inquiriesData, error: inquiriesError } = await supabase.from('inquiries').select('*').order('created_at', { ascending: false });
+    if (inquiriesError) console.error('Error fetching inquiries:', inquiriesError);
+    else setInquiries(inquiriesData);
+
+    setLoading(false);
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      const { data: propertiesData, error: propertiesError } = await supabase.from('properties').select('*');
-      if (propertiesError) console.error('Error fetching properties:', propertiesError);
-      else setProperties(propertiesData);
-
-      const { data: inquiriesData, error: inquiriesError } = await supabase.from('inquiries').select('*');
-      if (inquiriesError) console.error('Error fetching inquiries:', inquiriesError);
-      else setInquiries(inquiriesData);
-
-      setLoading(false);
-    };
-
     if (isAuthenticated) {
       fetchData();
     }
@@ -232,7 +232,10 @@ const Admin = () => {
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                   <PropertyForm 
                     property={selectedProperty} 
-                    onSubmit={() => setSelectedProperty(null)} 
+                    onSubmit={() => {
+                      setSelectedProperty(null);
+                      fetchData();
+                    }} 
                     onCancel={() => setSelectedProperty(null)}
                   />
                 </div>
