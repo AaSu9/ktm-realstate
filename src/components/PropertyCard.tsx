@@ -23,6 +23,7 @@ interface Property {
   status?: string;
   created_at: string;
   property_id?: string;
+  map_url?: string;
 }
 
 interface PropertyCardProps {

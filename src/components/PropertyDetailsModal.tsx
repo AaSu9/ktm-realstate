@@ -30,6 +30,7 @@ interface Property {
   tiktok_url?: string;
   created_at: string;
   property_id?: string;
+  map_url?: string;
 }
 
 interface PropertyDetailsModalProps {
@@ -282,6 +283,24 @@ const PropertyDetailsModal = ({ property, isOpen, onClose }: PropertyDetailsModa
                     TikTok
                   </Button>
                 )}
+              </div>
+            </div>
+          )}
+
+          {/* Map Location */}
+          {property.map_url && (
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Location Map</h3>
+              <div className="w-full h-[400px] rounded-lg overflow-hidden border">
+                <iframe 
+                  src={property.map_url} 
+                  width="100%" 
+                  height="100%" 
+                  style={{ border: 0 }} 
+                  allowFullScreen 
+                  loading="lazy" 
+                  referrerPolicy="no-referrer-when-downgrade"
+                ></iframe>
               </div>
             </div>
           )}

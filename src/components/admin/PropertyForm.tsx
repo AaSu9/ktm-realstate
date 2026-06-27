@@ -32,6 +32,7 @@ interface Property {
   youtube_url?: string;
   tiktok_url?: string;
   property_id?: string;
+  map_url?: string;
 }
 
 interface PropertyFormProps {
@@ -66,6 +67,7 @@ const PropertyForm = ({ property, onSubmit, onCancel }: PropertyFormProps) => {
     youtube_url: '',
     tiktok_url: '',
     property_id: '',
+    map_url: '',
   });
 
   useEffect(() => {
@@ -90,6 +92,7 @@ const PropertyForm = ({ property, onSubmit, onCancel }: PropertyFormProps) => {
         youtube_url: property.youtube_url || '',
         tiktok_url: property.tiktok_url || '',
         property_id: property.property_id || '',
+        map_url: property.map_url || '',
       });
     } else {
       setFormData({
@@ -112,6 +115,7 @@ const PropertyForm = ({ property, onSubmit, onCancel }: PropertyFormProps) => {
         youtube_url: '',
         tiktok_url: '',
         property_id: '',
+        map_url: '',
       });
     }
   }, [property]);
@@ -392,6 +396,16 @@ const PropertyForm = ({ property, onSubmit, onCancel }: PropertyFormProps) => {
                 value={formData.tiktok_url || ''}
                 onChange={(e) => setFormData(prev => ({ ...prev, tiktok_url: e.target.value }))}
                 placeholder="TikTok video URL"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="map_url">Map URL (Google Maps Embed Link)</Label>
+              <Input
+                id="map_url"
+                value={formData.map_url || ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, map_url: e.target.value }))}
+                placeholder="Google Maps embed URL"
               />
             </div>
           </div>
