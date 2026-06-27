@@ -400,12 +400,12 @@ const PropertyForm = ({ property, onSubmit, onCancel }: PropertyFormProps) => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="map_url">Map URL (Google Maps Embed Link)</Label>
+              <Label htmlFor="map_url">Map (Google Maps Embed Code)</Label>
               <Input
                 id="map_url"
                 value={formData.map_url || ''}
                 onChange={(e) => setFormData(prev => ({ ...prev, map_url: e.target.value }))}
-                placeholder="Google Maps embed URL"
+                placeholder="Paste the full <iframe...> code or src URL"
               />
             </div>
           </div>

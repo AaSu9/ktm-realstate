@@ -125,6 +125,15 @@ const PropertyDetailsModal = ({ property, isOpen, onClose }: PropertyDetailsModa
     return `NPR ${price.toLocaleString()}`;
   };
 
+  const getMapEmbedUrl = (url: string) => {
+    if (!url) return '';
+    if (url.includes('<iframe') && url.includes('src=')) {
+      const match = url.match(/src="([^"]+)"/);
+      return match ? match[1] : url;
+    }
+    return url;
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -293,7 +302,7 @@ const PropertyDetailsModal = ({ property, isOpen, onClose }: PropertyDetailsModa
               <h3 className="text-lg font-semibold">Location Map</h3>
               <div className="w-full h-[400px] rounded-lg overflow-hidden border">
                 <iframe 
-                  src={property.map_url} 
+                  src={getMapEmbedUrl(property.map_url)} 
                   width="100%" 
                   height="100%" 
                   style={{ border: 0 }} 
