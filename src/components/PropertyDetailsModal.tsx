@@ -137,14 +137,17 @@ const PropertyDetailsModal = ({ property, isOpen, onClose }: PropertyDetailsModa
     if (url.includes('google.com/maps/embed') || url.includes('maps.google.com/maps?')) {
       return url;
     }
-    // Short links (maps.app.goo.gl, goo.gl, etc.) — cannot be embedded
+    // If it's a short link or a standard maps link, convert it using the q= parameter
+    if (url.startsWith('http')) {
+      return `https://maps.google.com/maps?q=${encodeURIComponent(url)}&t=&z=14&ie=UTF8&iwloc=&output=embed`;
+    }
     return null;
   };
 
   // Returns true if the url is a regular/short link the user can open directly
   const isOpenableLink = (url: string): boolean => {
     if (!url) return false;
-    return url.trim().startsWith('http') && getEmbedSrc(url) === null;
+    return url.trim().startsWith('http') && !url.includes('<iframe');
   };
 
   // Embed src to use when NO map_url is set — shows the area based on location text

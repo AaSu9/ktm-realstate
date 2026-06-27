@@ -440,20 +440,33 @@ const PropertyForm = ({ property, onSubmit, onCancel }: PropertyFormProps) => {
                 className="font-mono text-xs"
               />
               {formData.map_url && (() => {
-                const url = formData.map_url;
+                const url = formData.map_url.trim();
                 const isIframe = url.includes('<iframe');
                 const isEmbedUrl = url.includes('google.com/maps/embed') || url.includes('maps.google.com/maps?');
                 const srcMatch = isIframe ? url.match(/src="([^"]+)"/) : null;
-                const embedSrc = srcMatch ? srcMatch[1] : (isEmbedUrl ? url : null);
+                
+                let embedSrc = null;
+                if (srcMatch) {
+                  embedSrc = srcMatch[1];
+                } else if (isEmbedUrl) {
+                  embedSrc = url;
+                } else if (url.startsWith('http')) {
+                  // Short links and regular maps links get converted using the q= query string trick
+                  embedSrc = `https://maps.google.com/maps?q=${encodeURIComponent(url)}&t=&z=14&ie=UTF8&iwloc=&output=embed`;
+                }
+
                 return (
-                  <div className="space-y-2">
-                    {embedSrc ? (
-                      <div className="rounded-lg overflow-hidden border h-[200px]">
+                  <div className="space-y-2 mt-4">
+                    {embedSrc && (
+                      <div className="rounded-lg overflow-hidden border h-[200px] w-full">
                         <iframe src={embedSrc} width="100%" height="100%" style={{border:0}} allowFullScreen loading="lazy"></iframe>
                       </div>
-                    ) : (
-                      <div className="flex items-center gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-                        <span className="text-amber-700 text-xs">⚠️ This link cannot be embedded. Use Google Maps → Share → <strong>Embed a map</strong> → Copy HTML instead. Your link will still be saved and shown as a button.</span>
+                    )}
+                    {url.startsWith('http') && !isIframe && (
+                      <div className="flex justify-end">
+                        <a href={url} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline mt-1 inline-block">
+                          Test Link in New Tab ↗
+                        </a>
                       </div>
                     )}
                   </div>

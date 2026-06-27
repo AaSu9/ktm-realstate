@@ -23,6 +23,7 @@ interface Property {
   category: string;
   status?: string;
   created_at: string;
+  map_url?: string;
 }
 
 interface FeaturedPropertiesProps {
