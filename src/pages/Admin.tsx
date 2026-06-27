@@ -50,6 +50,26 @@ const Admin = () => {
   useEffect(() => {
     if (isAuthenticated) {
       fetchData();
+
+      // Subscribe to real-time changes
+      const propertiesChannel = supabase
+        .channel('public:properties')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'properties' }, () => {
+          fetchData(); // Refresh data on any property change
+        })
+        .subscribe();
+
+      const inquiriesChannel = supabase
+        .channel('public:inquiries')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'inquiries' }, () => {
+          fetchData(); // Refresh data on any inquiry change
+        })
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(propertiesChannel);
+        supabase.removeChannel(inquiriesChannel);
+      };
     }
   }, [isAuthenticated]);
 

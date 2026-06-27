@@ -434,7 +434,17 @@ const PropertyForm = ({ property, onSubmit, onCancel }: PropertyFormProps) => {
               <Textarea
                 id="map_url"
                 value={formData.map_url || ''}
-                onChange={(e) => setFormData(prev => ({ ...prev, map_url: e.target.value }))}
+                onChange={(e) => {
+                  let url = e.target.value;
+                  // Auto-extract src from iframe if user pastes the whole embed code
+                  if (url.includes('<iframe')) {
+                    const match = url.match(/src="([^"]+)"/);
+                    if (match && match[1]) {
+                      url = match[1];
+                    }
+                  }
+                  setFormData(prev => ({ ...prev, map_url: url }));
+                }}
                 placeholder={`Paste the full iframe embed code from Google Maps:\n1. Go to Google Maps → find location → Share → Embed a map\n2. Click "Copy HTML" and paste it here`}
                 rows={4}
                 className="font-mono text-xs"

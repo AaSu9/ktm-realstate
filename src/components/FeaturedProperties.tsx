@@ -62,6 +62,18 @@ const FeaturedProperties = ({ searchResults }: FeaturedPropertiesProps) => {
     };
 
     fetchProperties();
+
+    // Subscribe to real-time changes
+    const channel = supabase
+      .channel('public:properties')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'properties' }, () => {
+        fetchProperties(); // Refresh data on any property change
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [searchResults]);
 
   const filteredProperties = useMemo(() => {
