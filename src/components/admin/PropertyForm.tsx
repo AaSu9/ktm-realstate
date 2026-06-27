@@ -460,10 +460,8 @@ const PropertyForm = ({ property, onSubmit, onCancel }: PropertyFormProps) => {
                   embedSrc = srcMatch[1];
                 } else if (isEmbedUrl) {
                   embedSrc = url;
-                } else if (url.startsWith('http')) {
-                  // Short links and regular maps links get converted using the q= query string trick
-                  embedSrc = `https://maps.google.com/maps?q=${encodeURIComponent(url)}&t=&z=14&ie=UTF8&iwloc=&output=embed`;
                 }
+                // Do not embed short links directly, they get blocked by X-Frame-Options
 
                 return (
                   <div className="space-y-2 mt-4">

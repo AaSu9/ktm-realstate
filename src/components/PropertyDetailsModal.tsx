@@ -125,7 +125,6 @@ const PropertyDetailsModal = ({ property, isOpen, onClose }: PropertyDetailsModa
     return `NPR ${price.toLocaleString()}`;
   };
 
-  // Returns embed src ONLY if embeddable, null otherwise
   const getEmbedSrc = (url: string): string | null => {
     if (!url) return null;
     // Full iframe tag — extract src
@@ -134,13 +133,11 @@ const PropertyDetailsModal = ({ property, isOpen, onClose }: PropertyDetailsModa
       return match ? match[1] : null;
     }
     // Direct embed URLs
-    if (url.includes('google.com/maps/embed') || url.includes('maps.google.com/maps?')) {
+    if (url.includes('google.com/maps/embed') || (url.includes('maps.google.com/maps') && url.includes('embed'))) {
       return url;
     }
-    // If it's a short link or a standard maps link, convert it using the q= parameter
-    if (url.startsWith('http')) {
-      return `https://maps.google.com/maps?q=${encodeURIComponent(url)}&t=&z=14&ie=UTF8&iwloc=&output=embed`;
-    }
+    // Do not attempt to embed short links or standard Google Maps URLs directly via iframe.
+    // They have X-Frame-Options set to SAMEORIGIN and embedding them as q=URL fails.
     return null;
   };
 
@@ -152,7 +149,7 @@ const PropertyDetailsModal = ({ property, isOpen, onClose }: PropertyDetailsModa
 
   // Embed src to use when NO map_url is set — shows the area based on location text
   const getLocationFallbackSrc = (location: string): string => {
-    return `https://maps.google.com/maps?q=${encodeURIComponent(location)}&t=&z=14&ie=UTF8&iwloc=&output=embed`;
+    return `https://maps.google.com/maps?width=100%25&height=600&hl=en&q=${encodeURIComponent(location)}&t=&z=14&ie=UTF8&iwloc=B&output=embed`;
   };
 
   return (

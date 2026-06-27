@@ -8,6 +8,7 @@ import AdminTestimonials from '@/pages/admin/testimonials';
 import AdminValues from '@/pages/admin/values';
 import AdminAchievements from '@/pages/admin/achievements';
 import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 import { 
   Building2, 
   MessageSquare, 
@@ -23,10 +24,9 @@ import {
 } from 'lucide-react';
 import { BrandLogo } from '@/components/BrandLogo';
 
-const ADMIN_SECRET = "2059asis@#"; // Replace with an environment variable
-
 const Admin = () => {
-  const [secret, setSecret] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState(null);
   const [properties, setProperties] = useState([]);
@@ -48,6 +48,16 @@ const Admin = () => {
   };
 
   useEffect(() => {
+    // Check initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsAuthenticated(!!session);
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAuthenticated(!!session);
+    });
+
     if (isAuthenticated) {
       fetchData();
 
@@ -69,34 +79,54 @@ const Admin = () => {
       return () => {
         supabase.removeChannel(propertiesChannel);
         supabase.removeChannel(inquiriesChannel);
+        subscription.unsubscribe();
       };
     }
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, [isAuthenticated]);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (secret === ADMIN_SECRET) {
-      setIsAuthenticated(true);
-    } else {
-      alert('Invalid secret');
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    
+    if (error) {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
     }
   };
 
+  const { toast } = useToast();
+
   const handleUpdateStatus = async (id: string, status: string) => {
     const { error } = await supabase.from('properties').update({ status }).eq('id', id);
-    if (error) console.error('Error updating status:', error);
+    if (error) {
+      console.error('Error updating status:', error);
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    }
   };
 
   const handleToggleFeatured = async (id: string, is_featured: boolean) => {
     const { error } = await supabase.from('properties').update({ is_featured }).eq('id', id);
-    if (error) console.error('Error updating featured:', error);
+    if (error) {
+      console.error('Error updating featured:', error);
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    }
   };
 
   const handleDelete = async (id: string) => {
     if(window.confirm('Are you sure you want to delete this property?')) {
       const { error } = await supabase.from('properties').delete().eq('id', id);
-      if (error) console.error('Error deleting property:', error);
-      else setProperties(properties.filter(p => p.id !== id));
+      if (error) {
+        console.error('Error deleting property:', error);
+        toast({ title: 'Error', description: error.message, variant: 'destructive' });
+      } else {
+        setProperties(properties.filter(p => p.id !== id));
+      }
     }
   };
 
@@ -124,22 +154,40 @@ const Admin = () => {
           <div className="bg-white/80 backdrop-blur-xl py-8 px-4 shadow-2xl sm:rounded-2xl sm:px-10 border border-white/20">
             <form className="space-y-6" onSubmit={handleLogin}>
               <div>
-                <label htmlFor="secret" className="block text-sm font-medium text-gray-700">
-                  Access Secret Key
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                  Email Address
+                </label>
+                <div className="mt-1 relative rounded-md shadow-sm">
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="appearance-none block w-full px-3 py-3 border border-gray-300 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm transition-colors"
+                    placeholder="admin@example.com"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                  Password
                 </label>
                 <div className="mt-1 relative rounded-md shadow-sm">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <Lock className="h-5 w-5 text-gray-400" />
                   </div>
                   <input
-                    id="secret"
-                    name="secret"
+                    id="password"
+                    name="password"
                     type="password"
                     required
-                    value={secret}
-                    onChange={(e) => setSecret(e.target.value)}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     className="appearance-none block w-full pl-10 px-3 py-3 border border-gray-300 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm transition-colors"
-                    placeholder="Enter your admin key"
+                    placeholder="Enter your password"
                   />
                 </div>
               </div>
@@ -212,7 +260,7 @@ const Admin = () => {
 
         <div className="p-4 border-t border-white/10">
           <button
-            onClick={() => setIsAuthenticated(false)}
+            onClick={() => supabase.auth.signOut()}
             className="flex items-center w-full px-4 py-3 text-sm font-medium text-red-300 rounded-xl hover:bg-red-500/10 hover:text-red-200 transition-colors"
           >
             <LogOut className="mr-3 h-5 w-5" />
