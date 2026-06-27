@@ -254,13 +254,21 @@ const Admin = () => {
                         inq.status === 'new' || !inq.status ? { ...inq, status: 'read' } : inq
                       )
                     );
-                    // Persist to Supabase in background
+                    // Persist to Supabase - mark status='new' as read
                     supabase
                       .from('inquiries')
                       .update({ status: 'read' })
-                      .or('status.eq.new,status.is.null')
+                      .eq('status', 'new')
                       .then(({ error }) => {
-                        if (error) console.error('Error marking inquiries as read:', error);
+                        if (error) console.error('Error marking new inquiries as read:', error);
+                      });
+                    // Also mark null-status inquiries as read
+                    supabase
+                      .from('inquiries')
+                      .update({ status: 'read' })
+                      .is('status', null)
+                      .then(({ error }) => {
+                        if (error) console.error('Error marking null-status inquiries as read:', error);
                       });
                   }
                 }}
