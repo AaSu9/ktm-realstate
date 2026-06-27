@@ -127,22 +127,28 @@ const PropertyDetailsModal = ({ property, isOpen, onClose }: PropertyDetailsModa
 
   const getMapEmbedUrl = (url: string, location: string) => {
     if (url) {
+      // If it's a full iframe embed tag, extract the src
       if (url.includes('<iframe') && url.includes('src=')) {
         const match = url.match(/src="([^"]+)"/);
         if (match) return match[1];
       }
-      // If it's explicitly a Google Maps embed URL, use it
-      if (url.includes('google.com/maps/embed') || url.includes('maps.google.com/maps?q=')) {
+      // If it's already a proper Google Maps embed URL, use directly
+      if (url.includes('google.com/maps/embed') || url.includes('maps.google.com/maps?')) {
         return url;
       }
+      // Otherwise (goo.gl, maps.app.goo.gl, normal maps link) — cannot be embedded
+      return null;
     }
-    
-    // Fallback: If no URL is provided OR if they pasted a regular Google Maps link that refuses to connect,
-    // we use a generic Google Maps search embed based on the property location string.
+    // Fallback: generate embed from location text
     if (location) {
       return `https://maps.google.com/maps?q=${encodeURIComponent(location)}&t=&z=14&ie=UTF8&iwloc=&output=embed`;
     }
-    return '';
+    return null;
+  };
+
+  const isExternalMapsLink = (url: string) => {
+    if (!url) return false;
+    return url.startsWith('http') && !url.includes('google.com/maps/embed') && !url.includes('maps.google.com/maps?') && !url.includes('<iframe');
   };
 
   return (
@@ -309,26 +315,39 @@ const PropertyDetailsModal = ({ property, isOpen, onClose }: PropertyDetailsModa
 
           {/* Map Location */}
           {(property.map_url || property.location) && (
-            <div className="space-y-4">
+            <div className="space-y-3">
               <h3 className="text-lg font-semibold">Location Map</h3>
-              <div className="w-full h-[400px] rounded-lg overflow-hidden border">
-                <iframe 
-                  src={getMapEmbedUrl(property.map_url || '', property.location)} 
-                  width="100%" 
-                  height="100%" 
-                  style={{ border: 0 }} 
-                  allowFullScreen 
-                  loading="lazy" 
-                  referrerPolicy="no-referrer-when-downgrade"
-                ></iframe>
-              </div>
-              {property.map_url && !property.map_url.includes('<iframe') && !property.map_url.includes('embed') && (
-                <div className="text-right">
-                  <a href={property.map_url} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 hover:underline flex items-center justify-end gap-1">
-                    <MapPin className="h-4 w-4" /> Open in Google Maps
-                  </a>
-                </div>
-              )}
+              {(() => {
+                const embedSrc = getMapEmbedUrl(property.map_url || '', property.location);
+                const showExternalLink = property.map_url && isExternalMapsLink(property.map_url);
+                return (
+                  <>
+                    {embedSrc ? (
+                      <div className="w-full h-[400px] rounded-lg overflow-hidden border">
+                        <iframe 
+                          src={embedSrc}
+                          width="100%" 
+                          height="100%" 
+                          style={{ border: 0 }} 
+                          allowFullScreen 
+                          loading="lazy" 
+                          referrerPolicy="no-referrer-when-downgrade"
+                        ></iframe>
+                      </div>
+                    ) : null}
+                    {showExternalLink && (
+                      <a 
+                        href={property.map_url} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors"
+                      >
+                        <MapPin className="h-4 w-4" /> View Exact Location on Google Maps
+                      </a>
+                    )}
+                  </>
+                );
+              })()}
             </div>
           )}
 

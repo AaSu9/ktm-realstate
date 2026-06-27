@@ -399,14 +399,36 @@ const PropertyForm = ({ property, onSubmit, onCancel }: PropertyFormProps) => {
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="map_url">Map (Google Maps Embed Code)</Label>
-              <Input
+            <div className="space-y-2 col-span-2">
+              <Label htmlFor="map_url">📍 Google Maps Embed Code</Label>
+              <Textarea
                 id="map_url"
                 value={formData.map_url || ''}
                 onChange={(e) => setFormData(prev => ({ ...prev, map_url: e.target.value }))}
-                placeholder="Paste the full <iframe...> code or src URL"
+                placeholder={`Paste the full iframe embed code from Google Maps:\n1. Go to Google Maps → find location → Share → Embed a map\n2. Click "Copy HTML" and paste it here`}
+                rows={4}
+                className="font-mono text-xs"
               />
+              {formData.map_url && (() => {
+                const url = formData.map_url;
+                const isIframe = url.includes('<iframe');
+                const isEmbedUrl = url.includes('google.com/maps/embed') || url.includes('maps.google.com/maps?');
+                const srcMatch = isIframe ? url.match(/src="([^"]+)"/) : null;
+                const embedSrc = srcMatch ? srcMatch[1] : (isEmbedUrl ? url : null);
+                return (
+                  <div className="space-y-2">
+                    {embedSrc ? (
+                      <div className="rounded-lg overflow-hidden border h-[200px]">
+                        <iframe src={embedSrc} width="100%" height="100%" style={{border:0}} allowFullScreen loading="lazy"></iframe>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                        <span className="text-amber-700 text-xs">⚠️ This link cannot be embedded. Use Google Maps → Share → <strong>Embed a map</strong> → Copy HTML instead. Your link will still be saved and shown as a button.</span>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
             </div>
           </div>
 
