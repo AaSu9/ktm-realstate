@@ -207,9 +207,10 @@ const Admin = () => {
     );
   }
 
+  const newInquiriesCount = inquiries.filter((inq: any) => inq.status === 'new' || !inq.status).length;
   const navItems = [
     { id: 'properties', label: 'Properties', icon: Building2 },
-    { id: 'inquiries', label: 'Inquiries', icon: MessageSquare },
+    { id: 'inquiries', label: 'Inquiries', icon: MessageSquare, badge: newInquiriesCount },
     { id: 'contact', label: 'Contact', icon: Phone },
     { id: 'stats', label: 'Stats', icon: BarChart2 },
     { id: 'testimonials', label: 'Testimonials', icon: MessageCircle },
@@ -244,6 +245,16 @@ const Admin = () => {
                 onClick={() => {
                   setCurrentTab(item.id);
                   setSidebarOpen(false);
+                  // When clicking Inquiries, mark all 'new' as 'read' to clear the badge
+                  if (item.id === 'inquiries' && newInquiriesCount > 0) {
+                    supabase
+                      .from('inquiries')
+                      .update({ status: 'read' })
+                      .or('status.eq.new,status.is.null')
+                      .then(({ error }) => {
+                        if (error) console.error('Error marking inquiries as read:', error);
+                      });
+                  }
                 }}
                 className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${
                   currentTab === item.id
@@ -253,6 +264,11 @@ const Admin = () => {
               >
                 <item.icon className={`mr-3 h-5 w-5 ${currentTab === item.id ? 'text-green-400' : 'text-gray-400'}`} />
                 {item.label}
+                {'badge' in item && item.badge > 0 && (
+                  <span className="ml-auto bg-red-500 text-white text-xs font-bold min-w-[20px] h-5 flex items-center justify-center px-1.5 rounded-full shadow-lg animate-pulse">
+                    {item.badge}
+                  </span>
+                )}
               </button>
             ))}
           </nav>
