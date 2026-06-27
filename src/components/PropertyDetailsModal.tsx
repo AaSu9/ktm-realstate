@@ -125,13 +125,24 @@ const PropertyDetailsModal = ({ property, isOpen, onClose }: PropertyDetailsModa
     return `NPR ${price.toLocaleString()}`;
   };
 
-  const getMapEmbedUrl = (url: string) => {
-    if (!url) return '';
-    if (url.includes('<iframe') && url.includes('src=')) {
-      const match = url.match(/src="([^"]+)"/);
-      return match ? match[1] : url;
+  const getMapEmbedUrl = (url: string, location: string) => {
+    if (url) {
+      if (url.includes('<iframe') && url.includes('src=')) {
+        const match = url.match(/src="([^"]+)"/);
+        if (match) return match[1];
+      }
+      // If it's explicitly a Google Maps embed URL, use it
+      if (url.includes('google.com/maps/embed') || url.includes('maps.google.com/maps?q=')) {
+        return url;
+      }
     }
-    return url;
+    
+    // Fallback: If no URL is provided OR if they pasted a regular Google Maps link that refuses to connect,
+    // we use a generic Google Maps search embed based on the property location string.
+    if (location) {
+      return `https://maps.google.com/maps?q=${encodeURIComponent(location)}&t=&z=14&ie=UTF8&iwloc=&output=embed`;
+    }
+    return '';
   };
 
   return (
@@ -297,12 +308,12 @@ const PropertyDetailsModal = ({ property, isOpen, onClose }: PropertyDetailsModa
           )}
 
           {/* Map Location */}
-          {property.map_url && (
+          {(property.map_url || property.location) && (
             <div className="space-y-4">
               <h3 className="text-lg font-semibold">Location Map</h3>
               <div className="w-full h-[400px] rounded-lg overflow-hidden border">
                 <iframe 
-                  src={getMapEmbedUrl(property.map_url)} 
+                  src={getMapEmbedUrl(property.map_url || '', property.location)} 
                   width="100%" 
                   height="100%" 
                   style={{ border: 0 }} 
@@ -311,6 +322,13 @@ const PropertyDetailsModal = ({ property, isOpen, onClose }: PropertyDetailsModa
                   referrerPolicy="no-referrer-when-downgrade"
                 ></iframe>
               </div>
+              {property.map_url && !property.map_url.includes('<iframe') && !property.map_url.includes('embed') && (
+                <div className="text-right">
+                  <a href={property.map_url} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 hover:underline flex items-center justify-end gap-1">
+                    <MapPin className="h-4 w-4" /> Open in Google Maps
+                  </a>
+                </div>
+              )}
             </div>
           )}
 
