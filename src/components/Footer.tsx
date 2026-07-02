@@ -152,7 +152,7 @@ const Footer = () => {
         <div className="border-t border-primary-foreground/20 py-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="text-primary-foreground/80 text-sm mb-4 md:mb-0">
-              © {new Date().getFullYear()} KTM Realstate. All rights reserved.
+              © {new Date().getFullYear()} KTM Realstate. All rights reserved. • AAN creator💚
             </div>
             <div className="flex space-x-6 text-sm">
               <a href="#" className="text-primary-foreground/80 hover:text-accent transition-colors">Privacy Policy</a>
