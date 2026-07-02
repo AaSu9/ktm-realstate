@@ -34,6 +34,9 @@ const Admin = () => {
   const [loading, setLoading] = useState(true);
   const [currentTab, setCurrentTab] = useState('properties');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [updatingPassword, setUpdatingPassword] = useState(false);
 
   const fetchData = async () => {
     const { data: propertiesData, error: propertiesError } = await supabase.from('properties').select('*').order('created_at', { ascending: false });
@@ -101,6 +104,38 @@ const Admin = () => {
   };
 
   const { toast } = useToast();
+
+  const handlePasswordChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newPassword.length < 6) {
+      toast({ 
+        title: 'Validation Error', 
+        description: 'Password must be at least 6 characters long.', 
+        variant: 'destructive' 
+      });
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast({ 
+        title: 'Validation Error', 
+        description: 'Passwords do not match.', 
+        variant: 'destructive' 
+      });
+      return;
+    }
+
+    setUpdatingPassword(true);
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    setUpdatingPassword(false);
+
+    if (error) {
+      toast({ title: 'Error updating password', description: error.message, variant: 'destructive' });
+    } else {
+      toast({ title: 'Success', description: 'Password updated successfully!' });
+      setNewPassword('');
+      setConfirmPassword('');
+    }
+  };
 
   const handleUpdateStatus = async (id: string, status: string) => {
     const { error } = await supabase.from('properties').update({ status }).eq('id', id);
@@ -216,6 +251,7 @@ const Admin = () => {
     { id: 'testimonials', label: 'Testimonials', icon: MessageCircle },
     { id: 'values', label: 'Values', icon: Heart },
     { id: 'achievements', label: 'Achievements', icon: Award },
+    { id: 'security', label: 'Security', icon: Lock },
   ];
 
   return (
@@ -385,6 +421,70 @@ const Admin = () => {
             {currentTab === 'achievements' && (
               <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 animate-in fade-in duration-500">
                 <AdminAchievements />
+              </div>
+            )}
+
+            {currentTab === 'security' && (
+              <div className="max-w-md mx-auto bg-white rounded-2xl shadow-sm border border-gray-100 p-8 animate-in fade-in duration-500">
+                <div className="flex items-center space-x-3 mb-6">
+                  <div className="p-3 bg-green-50 text-green-700 rounded-xl">
+                    <Lock className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-gray-900">Security Settings</h2>
+                    <p className="text-sm text-gray-500">Update your administrator password</p>
+                  </div>
+                </div>
+
+                <form onSubmit={handlePasswordChange} className="space-y-5">
+                  <div>
+                    <label htmlFor="new-password" className="block text-sm font-medium text-gray-700 mb-1">
+                      New Password
+                    </label>
+                    <div className="relative rounded-md shadow-sm">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <Lock className="h-5 w-5 text-gray-400" />
+                      </div>
+                      <input
+                        id="new-password"
+                        type="password"
+                        required
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        className="appearance-none block w-full pl-10 px-3 py-3 border border-gray-300 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm transition-colors"
+                        placeholder="Min. 6 characters"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-700 mb-1">
+                      Confirm New Password
+                    </label>
+                    <div className="relative rounded-md shadow-sm">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <Lock className="h-5 w-5 text-gray-400" />
+                      </div>
+                      <input
+                        id="confirm-password"
+                        type="password"
+                        required
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        className="appearance-none block w-full pl-10 px-3 py-3 border border-gray-300 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm transition-colors"
+                        placeholder="Re-enter new password"
+                      />
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={updatingPassword}
+                    className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-[#1B3A1F] hover:bg-[#2c5831] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#1B3A1F] transition-all duration-200 ease-in-out transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                  >
+                    {updatingPassword ? 'Updating Password...' : 'Update Password'}
+                  </button>
+                </form>
               </div>
             )}
 
