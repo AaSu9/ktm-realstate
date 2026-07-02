@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import PropertyList from '@/components/admin/PropertyList';
 import PropertyForm from '@/components/admin/PropertyForm';
 import InquiriesList from '@/components/admin/InquiriesList';
@@ -37,6 +37,7 @@ const Admin = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [updatingPassword, setUpdatingPassword] = useState(false);
+  const formRef = useRef<HTMLDivElement>(null);
 
   const fetchData = async () => {
     const { data: propertiesData, error: propertiesError } = await supabase.from('properties').select('*').order('created_at', { ascending: false });
@@ -135,6 +136,11 @@ const Admin = () => {
       setNewPassword('');
       setConfirmPassword('');
     }
+  };
+
+  const handleEdit = (property: any) => {
+    setSelectedProperty(property);
+    formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   const handleUpdateStatus = async (id: string, status: string) => {
@@ -365,7 +371,7 @@ const Admin = () => {
             
             {currentTab === 'properties' && (
               <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                <div ref={formRef} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                   <PropertyForm 
                     property={selectedProperty} 
                     onSubmit={() => {
@@ -379,7 +385,7 @@ const Admin = () => {
                   <PropertyList 
                     properties={properties} 
                     loading={loading} 
-                    onEdit={setSelectedProperty} 
+                    onEdit={handleEdit} 
                     onUpdateStatus={handleUpdateStatus} 
                     onToggleFeatured={handleToggleFeatured} 
                     onDelete={handleDelete} 
