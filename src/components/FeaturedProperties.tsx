@@ -48,7 +48,7 @@ const FeaturedProperties = ({ searchResults }: FeaturedPropertiesProps) => {
       const { data, error } = await supabase
         .from('properties')
         .select('*')
-        .eq('status', 'available')
+        .in('status', ['available', 'AVAILABLE'])
         .order('created_at', { ascending: false })
         .limit(20);
 

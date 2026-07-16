@@ -53,7 +53,7 @@ const PropertySearch = ({ onSearchResults, className }: PropertySearchProps) => 
       let query = supabase
         .from('properties')
         .select('*')
-        .eq('status', 'available');
+        .in('status', ['available', 'AVAILABLE']);
 
       if (currentSearchData.propertyId) {
         query = query.eq('property_id', currentSearchData.propertyId);
