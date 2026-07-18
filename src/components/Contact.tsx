@@ -91,7 +91,7 @@ const Contact = () => {
       if (dbError) throw dbError;
 
       // 2. Insert into Message (CRM Messages tab)
-      const { error: msgError } = await supabase.from('Message').insert([{
+      const { error: msgError } = await (supabase as any).from('Message').insert([{
         senderName: formData.fullName,
         email: formData.email,
         phone: formData.phone || null,

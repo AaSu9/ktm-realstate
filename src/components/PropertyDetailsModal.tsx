@@ -104,7 +104,7 @@ const PropertyDetailsModal = ({ property, isOpen, onClose }: PropertyDetailsModa
       if (error) throw error;
 
       // 2. Insert into Message (CRM Messages tab)
-      const { error: msgError } = await supabase.from('Message').insert([{
+      const { error: msgError } = await (supabase as any).from('Message').insert([{
         senderName: contactForm.name,
         email: contactForm.email,
         phone: contactForm.phone,
