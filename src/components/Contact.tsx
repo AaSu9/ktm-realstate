@@ -78,6 +78,7 @@ const Contact = () => {
     setIsSubmitting(true);
 
     try {
+      // 1. Insert into inquiries (Leads)
       const { error: dbError } = await supabase.from('inquiries').insert([{
         full_name: formData.fullName,
         phone: formData.phone,
@@ -88,6 +89,20 @@ const Contact = () => {
       }]);
 
       if (dbError) throw dbError;
+
+      // 2. Insert into Message (CRM Messages tab)
+      const { error: msgError } = await supabase.from('Message').insert([{
+        senderName: formData.fullName,
+        email: formData.email,
+        phone: formData.phone || null,
+        subject: formData.propertyInterest ? `Property Interest: ${formData.propertyInterest}` : 'Website Message',
+        content: formData.message,
+        status: 'UNREAD'
+      }]);
+
+      if (msgError) {
+        console.error("Failed to insert into Message table:", msgError);
+      }
       
       const subject = encodeURIComponent(`New Inquiry from ${formData.fullName}`);
       const body = encodeURIComponent(
