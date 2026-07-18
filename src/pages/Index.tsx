@@ -6,6 +6,7 @@ import Testimonials from '@/components/Testimonials';
 import CtaBanner from '@/components/CtaBanner';
 import About from '@/components/About';
 import Agents from '@/components/Agents';
+import Blog from '@/components/Blog';
 import Contact from '@/components/Contact';
 import Footer from '@/components/Footer';
 import QuickActions from '@/components/QuickActions';
@@ -54,6 +55,9 @@ const Index = () => {
         </section>
         <section id="agents">
           <Agents />
+        </section>
+        <section id="blog">
+          <Blog />
         </section>
         <section id="cta">
           <CtaBanner />
