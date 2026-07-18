@@ -79,7 +79,9 @@ const Contact = () => {
 
     try {
       // 1. Insert into inquiries (Leads)
+      // Generate UUID client-side since the DB default was removed by Prisma
       const { error: dbError } = await supabase.from('inquiries').insert([{
+        id: crypto.randomUUID(),
         full_name: formData.fullName,
         phone: formData.phone,
         email: formData.email,

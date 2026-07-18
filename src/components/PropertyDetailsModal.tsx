@@ -92,6 +92,7 @@ const PropertyDetailsModal = ({ property, isOpen, onClose }: PropertyDetailsModa
       const { error } = await supabase
         .from('inquiries')
         .insert([{
+          id: crypto.randomUUID(),
           full_name: contactForm.name,
           email: contactForm.email,
           phone: contactForm.phone,
