@@ -119,16 +119,8 @@ const PropertyDetailsModal = ({ property, isOpen, onClose }: PropertyDetailsModa
 
       toast({
         title: "Success!",
-        description: "Your inquiry has been saved! Redirecting to WhatsApp to notify the admin...",
+        description: "Your inquiry has been successfully sent. We will get back to you shortly.",
       });
-
-      // Construct WhatsApp message
-      const waMessage = `*New Inquiry Submitted*\nName: ${contactForm.name}\nEmail: ${contactForm.email}\nPhone: ${contactForm.phone}\nProperty: ${property.title} - ${property.location}\nMessage: ${contactForm.message || 'I am interested in this property.'}`;
-      
-      // Open WhatsApp in a new tab (non-blocking)
-      setTimeout(() => {
-        window.open(`https://wa.me/9779741690374?text=${encodeURIComponent(waMessage)}`, '_blank');
-      }, 1000);
 
       setContactForm({ name: '', email: '', phone: '', message: '' });
       setShowContactForm(false);

@@ -103,26 +103,8 @@ const Contact = () => {
       if (msgError) {
         console.error("Failed to insert into Message table:", msgError);
       }
-      
-      const subject = encodeURIComponent(`New Inquiry from ${formData.fullName}`);
-      const body = encodeURIComponent(
-        `You have received a new inquiry.\n\n` +
-        `Name: ${formData.fullName}\n` +
-        `Phone: ${formData.phone}\n` +
-        `Email: ${formData.email}\n` +
-        `Property Interest: ${formData.propertyInterest}\n` +
-        `Message: ${formData.message}`
-      );
       // Form submitted successfully, inquiry saved to database
-
-      toast({ title: "Message Sent!", description: "Redirecting to WhatsApp to notify us..." });
-
-      // Open WhatsApp in a new tab (non-blocking)
-      const phone = contactDetails?.whatsapp || '9779741690374';
-      setTimeout(() => {
-        window.open(`https://wa.me/${phone}?text=${body}`, '_blank');
-      }, 1000);
-
+      toast({ title: "Message Sent!", description: "Thank you! We will get back to you shortly." });
       setFormData({ fullName: '', phone: '', email: '', propertyInterest: '', message: '' });
     } catch (error) {
       const err = error as { message: string };
