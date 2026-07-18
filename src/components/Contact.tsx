@@ -90,19 +90,6 @@ const Contact = () => {
 
       if (dbError) throw dbError;
 
-      // 2. Insert into Message (CRM Messages tab)
-      const { error: msgError } = await (supabase as any).from('Message').insert([{
-        senderName: formData.fullName,
-        email: formData.email,
-        phone: formData.phone || null,
-        subject: formData.propertyInterest ? `Property Interest: ${formData.propertyInterest}` : 'Website Message',
-        content: formData.message,
-        status: 'UNREAD'
-      }]);
-
-      if (msgError) {
-        console.error("Failed to insert into Message table:", msgError);
-      }
       // Form submitted successfully, inquiry saved to database
       toast({ title: "Message Sent!", description: "Thank you! We will get back to you shortly." });
       setFormData({ fullName: '', phone: '', email: '', propertyInterest: '', message: '' });

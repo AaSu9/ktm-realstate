@@ -103,20 +103,6 @@ const PropertyDetailsModal = ({ property, isOpen, onClose }: PropertyDetailsModa
 
       if (error) throw error;
 
-      // 2. Insert into Message (CRM Messages tab)
-      const { error: msgError } = await (supabase as any).from('Message').insert([{
-        senderName: contactForm.name,
-        email: contactForm.email,
-        phone: contactForm.phone,
-        subject: `Property Inquiry: ${property.title}`,
-        content: contactForm.message || `Interested in property: ${property.title}`,
-        status: 'UNREAD'
-      }]);
-
-      if (msgError) {
-        console.error("Failed to insert into Message table:", msgError);
-      }
-
       toast({
         title: "Success!",
         description: "Your inquiry has been successfully sent. We will get back to you shortly.",
