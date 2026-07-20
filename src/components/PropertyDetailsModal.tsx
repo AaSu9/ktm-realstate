@@ -273,8 +273,8 @@ const PropertyDetailsModal = ({ property, isOpen, onClose }: PropertyDetailsModa
                     </CarouselItem>
                   ))}
                 </CarouselContent>
-                <CarouselPrevious className="absolute !left-4 top-1/2 -translate-y-1/2 z-10 bg-white/85 hover:bg-white text-emerald-900 border-none shadow-md h-9 w-9 flex items-center justify-center transition-all hover:scale-105" />
-                <CarouselNext className="absolute !right-4 top-1/2 -translate-y-1/2 z-10 bg-white/85 hover:bg-white text-emerald-900 border-none shadow-md h-9 w-9 flex items-center justify-center transition-all hover:scale-105" />
+                <CarouselPrevious className="absolute !left-4 top-1/2 -translate-y-1/2 z-10 bg-white/85 hover:bg-white text-emerald-900 border-none shadow-md h-9 w-9 hidden md:flex items-center justify-center transition-all hover:scale-105" />
+                <CarouselNext className="absolute !right-4 top-1/2 -translate-y-1/2 z-10 bg-white/85 hover:bg-white text-emerald-900 border-none shadow-md h-9 w-9 hidden md:flex items-center justify-center transition-all hover:scale-105" />
               </Carousel>
             </div>
           )}
