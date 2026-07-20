@@ -240,7 +240,7 @@ const Contact = () => {
             {(contactDetails?.facebook || contactDetails?.instagram || contactDetails?.youtube) && (
               <Card className="property-card mt-6">
                 <CardContent className="p-6">
-                  <h4 className="text-lg font-semibold text-foreground mb-4">Follow {contactDetails.branch_name || 'Us'}</h4>
+                  <h4 className="text-lg font-semibold text-foreground mb-4">Follow Us</h4>
                   <div className="flex space-x-4">
                     {contactDetails?.facebook && (
                       <Button variant="outline" size="sm" className="flex-1 hover:text-[#1877F2]" onClick={() => window.open(contactDetails.facebook!, '_blank')}>
