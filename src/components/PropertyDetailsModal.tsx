@@ -284,74 +284,112 @@ const PropertyDetailsModal = ({ property, isOpen, onClose }: PropertyDetailsModa
               </div>
 
               {/* Premium Core Specs Grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-3 bg-muted/20 p-4 rounded-2xl border border-border/60">
-                <div className="flex flex-col items-center text-center p-1 bg-white rounded-xl shadow-xs border border-border/30">
-                  <Home className="h-4 w-4 text-emerald-600 mb-1" />
-                  <span className="text-[11px] font-bold text-foreground capitalize truncate max-w-full">{property.property_type}</span>
-                  <span className="text-[9px] text-muted-foreground uppercase font-semibold mt-0.5">Type</span>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 bg-muted/10 p-3 rounded-2xl border border-border/40">
+                
+                {/* 1. Property Type */}
+                <div className="flex items-center gap-3 bg-white p-3 rounded-xl border border-border/30 hover:border-emerald-200 hover:shadow-xs transition-all duration-300">
+                  <div className="p-2 bg-emerald-50 rounded-lg text-emerald-600 flex-shrink-0">
+                    <Home className="h-4.5 w-4.5" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[9px] text-muted-foreground uppercase font-bold tracking-wider">Type</p>
+                    <p className="text-xs font-bold text-foreground capitalize truncate">{property.property_type}</p>
+                  </div>
                 </div>
-                
-                {property.landArea ? (
-                  <div className="flex flex-col items-center text-center p-1 bg-white rounded-xl shadow-xs border border-border/30">
-                    <Ruler className="h-4 w-4 text-emerald-600 mb-1" />
-                    <span className="text-[11px] font-bold text-foreground truncate max-w-full">{property.landArea}</span>
-                    <span className="text-[9px] text-muted-foreground uppercase font-semibold mt-0.5">Area</span>
-                  </div>
-                ) : property.area_sqft ? (
-                  <div className="flex flex-col items-center text-center p-1 bg-white rounded-xl shadow-xs border border-border/30">
-                    <Square className="h-4 w-4 text-emerald-600 mb-1" />
-                    <span className="text-[11px] font-bold text-foreground truncate max-w-full">{property.area_sqft} Sqft</span>
-                    <span className="text-[9px] text-muted-foreground uppercase font-semibold mt-0.5">Area</span>
+
+                {/* 2. Area */}
+                {property.landArea || property.area_sqft ? (
+                  <div className="flex items-center gap-3 bg-white p-3 rounded-xl border border-border/30 hover:border-emerald-200 hover:shadow-xs transition-all duration-300">
+                    <div className="p-2 bg-emerald-50 rounded-lg text-emerald-600 flex-shrink-0">
+                      {property.landArea ? <Ruler className="h-4.5 w-4.5" /> : <Square className="h-4.5 w-4.5" />}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[9px] text-muted-foreground uppercase font-bold tracking-wider">Area</p>
+                      <p className="text-xs font-bold text-foreground truncate" title={property.landArea || `${property.area_sqft} Sqft`}>
+                        {property.landArea || `${property.area_sqft} Sqft`}
+                      </p>
+                    </div>
                   </div>
                 ) : null}
-                
+
+                {/* 3. Bedrooms */}
                 {property.bedrooms ? (
-                  <div className="flex flex-col items-center text-center p-1 bg-white rounded-xl shadow-xs border border-border/30">
-                    <Bed className="h-4 w-4 text-emerald-600 mb-1" />
-                    <span className="text-[11px] font-bold text-foreground">{property.bedrooms}</span>
-                    <span className="text-[9px] text-muted-foreground uppercase font-semibold mt-0.5">Bedrooms</span>
+                  <div className="flex items-center gap-3 bg-white p-3 rounded-xl border border-border/30 hover:border-emerald-200 hover:shadow-xs transition-all duration-300">
+                    <div className="p-2 bg-emerald-50 rounded-lg text-emerald-600 flex-shrink-0">
+                      <Bed className="h-4.5 w-4.5" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[9px] text-muted-foreground uppercase font-bold tracking-wider">Bedrooms</p>
+                      <p className="text-xs font-bold text-foreground">{property.bedrooms}</p>
+                    </div>
                   </div>
                 ) : null}
 
+                {/* 4. Kitchens */}
                 {property.kitchens ? (
-                  <div className="flex flex-col items-center text-center p-1 bg-white rounded-xl shadow-xs border border-border/30">
-                    <UtensilsCrossed className="h-4 w-4 text-emerald-600 mb-1" />
-                    <span className="text-[11px] font-bold text-foreground">{property.kitchens}</span>
-                    <span className="text-[9px] text-muted-foreground uppercase font-semibold mt-0.5">Kitchen</span>
+                  <div className="flex items-center gap-3 bg-white p-3 rounded-xl border border-border/30 hover:border-emerald-200 hover:shadow-xs transition-all duration-300">
+                    <div className="p-2 bg-emerald-50 rounded-lg text-emerald-600 flex-shrink-0">
+                      <UtensilsCrossed className="h-4.5 w-4.5" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[9px] text-muted-foreground uppercase font-bold tracking-wider">Kitchen</p>
+                      <p className="text-xs font-bold text-foreground">{property.kitchens}</p>
+                    </div>
                   </div>
                 ) : null}
 
+                {/* 5. Bathrooms */}
                 {property.bathrooms ? (
-                  <div className="flex flex-col items-center text-center p-1 bg-white rounded-xl shadow-xs border border-border/30">
-                    <Bath className="h-4 w-4 text-emerald-600 mb-1" />
-                    <span className="text-[11px] font-bold text-foreground">{property.bathrooms}</span>
-                    <span className="text-[9px] text-muted-foreground uppercase font-semibold mt-0.5">Bathrooms</span>
+                  <div className="flex items-center gap-3 bg-white p-3 rounded-xl border border-border/30 hover:border-emerald-200 hover:shadow-xs transition-all duration-300">
+                    <div className="p-2 bg-emerald-50 rounded-lg text-emerald-600 flex-shrink-0">
+                      <Bath className="h-4.5 w-4.5" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[9px] text-muted-foreground uppercase font-bold tracking-wider">Bathrooms</p>
+                      <p className="text-xs font-bold text-foreground">{property.bathrooms}</p>
+                    </div>
                   </div>
                 ) : null}
 
+                {/* 6. Living Rooms */}
                 {property.livingRooms ? (
-                  <div className="flex flex-col items-center text-center p-1 bg-white rounded-xl shadow-xs border border-border/30">
-                    <Sofa className="h-4 w-4 text-emerald-600 mb-1" />
-                    <span className="text-[11px] font-bold text-foreground">{property.livingRooms}</span>
-                    <span className="text-[9px] text-muted-foreground uppercase font-semibold mt-0.5">Living</span>
+                  <div className="flex items-center gap-3 bg-white p-3 rounded-xl border border-border/30 hover:border-emerald-200 hover:shadow-xs transition-all duration-300">
+                    <div className="p-2 bg-emerald-50 rounded-lg text-emerald-600 flex-shrink-0">
+                      <Sofa className="h-4.5 w-4.5" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[9px] text-muted-foreground uppercase font-bold tracking-wider">Living</p>
+                      <p className="text-xs font-bold text-foreground">{property.livingRooms}</p>
+                    </div>
                   </div>
                 ) : null}
 
+                {/* 7. Parking */}
                 {property.parking ? (
-                  <div className="flex flex-col items-center text-center p-1 bg-white rounded-xl shadow-xs border border-border/30">
-                    <Car className="h-4 w-4 text-emerald-600 mb-1" />
-                    <span className="text-[11px] font-bold text-foreground truncate max-w-full" title={property.parking}>{property.parking}</span>
-                    <span className="text-[9px] text-muted-foreground uppercase font-semibold mt-0.5">Parking</span>
+                  <div className="flex items-center gap-3 bg-white p-3 rounded-xl border border-border/30 hover:border-emerald-200 hover:shadow-xs transition-all duration-300">
+                    <div className="p-2 bg-emerald-50 rounded-lg text-emerald-600 flex-shrink-0">
+                      <Car className="h-4.5 w-4.5" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[9px] text-muted-foreground uppercase font-bold tracking-wider">Parking</p>
+                      <p className="text-xs font-bold text-foreground truncate" title={property.parking}>{property.parking}</p>
+                    </div>
                   </div>
                 ) : null}
 
+                {/* 8. Floors */}
                 {property.totalFloors ? (
-                  <div className="flex flex-col items-center text-center p-1 bg-white rounded-xl shadow-xs border border-border/30">
-                    <Layers className="h-4 w-4 text-emerald-600 mb-1" />
-                    <span className="text-[11px] font-bold text-foreground">{property.totalFloors}</span>
-                    <span className="text-[9px] text-muted-foreground uppercase font-semibold mt-0.5">Floors</span>
+                  <div className="flex items-center gap-3 bg-white p-3 rounded-xl border border-border/30 hover:border-emerald-200 hover:shadow-xs transition-all duration-300">
+                    <div className="p-2 bg-emerald-50 rounded-lg text-emerald-600 flex-shrink-0">
+                      <Layers className="h-4.5 w-4.5" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[9px] text-muted-foreground uppercase font-bold tracking-wider">Floors</p>
+                      <p className="text-xs font-bold text-foreground">{property.totalFloors}</p>
+                    </div>
                   </div>
                 ) : null}
+
               </div>
 
               <div className="flex gap-2">
