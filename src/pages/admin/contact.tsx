@@ -31,6 +31,86 @@ const emptyBranch = (): ContactBranch => ({
   youtube_channel_id: '',
 });
 
+// Define BranchForm OUTSIDE to guarantee stable React identity and prevent focus loss
+interface BranchFormProps {
+  editForm: ContactBranch;
+  setEditForm: React.Dispatch<React.SetStateAction<ContactBranch>>;
+  handleSave: () => void;
+  handleCancel: () => void;
+  saving: boolean;
+}
+
+const BranchForm = ({ editForm, setEditForm, handleSave, handleCancel, saving }: BranchFormProps) => (
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 p-4 bg-gray-50 rounded-xl border border-dashed border-gray-200">
+    <div className="space-y-1">
+      <Label htmlFor="branch_name" className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Branch Name</Label>
+      <div className="relative">
+        <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+        <Input id="branch_name" className="pl-9" placeholder="e.g. Kathmandu Head Office" value={editForm.branch_name || ''} onChange={e => setEditForm(p => ({ ...p, branch_name: e.target.value }))} />
+      </div>
+    </div>
+    <div className="space-y-1">
+      <Label htmlFor="address" className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Address</Label>
+      <div className="relative">
+        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+        <Input id="address" className="pl-9" placeholder="Full address" value={editForm.address || ''} onChange={e => setEditForm(p => ({ ...p, address: e.target.value }))} />
+      </div>
+    </div>
+    <div className="space-y-1">
+      <Label htmlFor="phone" className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Phone Number</Label>
+      <div className="relative">
+        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+        <Input id="phone" className="pl-9" placeholder="+977-XXX-XXXXXXX" value={editForm.phone || ''} onChange={e => setEditForm(p => ({ ...p, phone: e.target.value }))} />
+      </div>
+    </div>
+    <div className="space-y-1">
+      <Label htmlFor="whatsapp" className="text-xs font-semibold text-gray-500 uppercase tracking-wider">WhatsApp Number</Label>
+      <div className="relative">
+        <MessageCircle className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+        <Input id="whatsapp" className="pl-9" placeholder="e.g. 9779812345678" value={editForm.whatsapp || ''} onChange={e => setEditForm(p => ({ ...p, whatsapp: e.target.value }))} />
+      </div>
+    </div>
+    <div className="space-y-1">
+      <Label htmlFor="facebook" className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Facebook URL</Label>
+      <div className="relative">
+        <Facebook className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+        <Input id="facebook" className="pl-9" placeholder="https://facebook.com/..." value={editForm.facebook || ''} onChange={e => setEditForm(p => ({ ...p, facebook: e.target.value }))} />
+      </div>
+    </div>
+    <div className="space-y-1">
+      <Label htmlFor="instagram" className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Instagram URL</Label>
+      <div className="relative">
+        <Instagram className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+        <Input id="instagram" className="pl-9" placeholder="https://instagram.com/..." value={editForm.instagram || ''} onChange={e => setEditForm(p => ({ ...p, instagram: e.target.value }))} />
+      </div>
+    </div>
+    <div className="space-y-1">
+      <Label htmlFor="youtube" className="text-xs font-semibold text-gray-500 uppercase tracking-wider">YouTube Channel URL</Label>
+      <div className="relative">
+        <Youtube className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+        <Input id="youtube" className="pl-9" placeholder="https://youtube.com/..." value={editForm.youtube || ''} onChange={e => setEditForm(p => ({ ...p, youtube: e.target.value }))} />
+      </div>
+    </div>
+    <div className="space-y-1">
+      <Label htmlFor="youtube_api_key" className="text-xs font-semibold text-gray-500 uppercase tracking-wider">YouTube API Key</Label>
+      <Input id="youtube_api_key" placeholder="Optional" value={editForm.youtube_api_key || ''} onChange={e => setEditForm(p => ({ ...p, youtube_api_key: e.target.value }))} />
+    </div>
+    <div className="space-y-1 md:col-span-2">
+      <Label htmlFor="youtube_channel_id" className="text-xs font-semibold text-gray-500 uppercase tracking-wider">YouTube Channel ID</Label>
+      <Input id="youtube_channel_id" placeholder="Optional" value={editForm.youtube_channel_id || ''} onChange={e => setEditForm(p => ({ ...p, youtube_channel_id: e.target.value }))} />
+    </div>
+    <div className="md:col-span-2 flex gap-3 pt-2">
+      <Button onClick={handleSave} disabled={saving} className="bg-[#1B3A1F] hover:bg-[#2c5831] text-white">
+        <Save className="h-4 w-4 mr-2" />
+        {saving ? 'Saving...' : 'Save Branch'}
+      </Button>
+      <Button variant="outline" onClick={handleCancel}>
+        <X className="h-4 w-4 mr-2" /> Cancel
+      </Button>
+    </div>
+  </div>
+);
+
 const ContactAdmin = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
@@ -113,77 +193,6 @@ const ContactAdmin = () => {
     }
   };
 
-  const BranchForm = () => (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 p-4 bg-gray-50 rounded-xl border border-dashed border-gray-200">
-      <div className="space-y-1">
-        <Label htmlFor="branch_name" className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Branch Name</Label>
-        <div className="relative">
-          <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-          <Input id="branch_name" className="pl-9" placeholder="e.g. Kathmandu Head Office" value={editForm.branch_name || ''} onChange={e => setEditForm(p => ({ ...p, branch_name: e.target.value }))} />
-        </div>
-      </div>
-      <div className="space-y-1">
-        <Label htmlFor="address" className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Address</Label>
-        <div className="relative">
-          <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-          <Input id="address" className="pl-9" placeholder="Full address" value={editForm.address || ''} onChange={e => setEditForm(p => ({ ...p, address: e.target.value }))} />
-        </div>
-      </div>
-      <div className="space-y-1">
-        <Label htmlFor="phone" className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Phone Number</Label>
-        <div className="relative">
-          <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-          <Input id="phone" className="pl-9" placeholder="+977-XXX-XXXXXXX" value={editForm.phone || ''} onChange={e => setEditForm(p => ({ ...p, phone: e.target.value }))} />
-        </div>
-      </div>
-      <div className="space-y-1">
-        <Label htmlFor="whatsapp" className="text-xs font-semibold text-gray-500 uppercase tracking-wider">WhatsApp Number</Label>
-        <div className="relative">
-          <MessageCircle className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-          <Input id="whatsapp" className="pl-9" placeholder="e.g. 9779812345678" value={editForm.whatsapp || ''} onChange={e => setEditForm(p => ({ ...p, whatsapp: e.target.value }))} />
-        </div>
-      </div>
-      <div className="space-y-1">
-        <Label htmlFor="facebook" className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Facebook URL</Label>
-        <div className="relative">
-          <Facebook className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-          <Input id="facebook" className="pl-9" placeholder="https://facebook.com/..." value={editForm.facebook || ''} onChange={e => setEditForm(p => ({ ...p, facebook: e.target.value }))} />
-        </div>
-      </div>
-      <div className="space-y-1">
-        <Label htmlFor="instagram" className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Instagram URL</Label>
-        <div className="relative">
-          <Instagram className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-          <Input id="instagram" className="pl-9" placeholder="https://instagram.com/..." value={editForm.instagram || ''} onChange={e => setEditForm(p => ({ ...p, instagram: e.target.value }))} />
-        </div>
-      </div>
-      <div className="space-y-1">
-        <Label htmlFor="youtube" className="text-xs font-semibold text-gray-500 uppercase tracking-wider">YouTube Channel URL</Label>
-        <div className="relative">
-          <Youtube className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-          <Input id="youtube" className="pl-9" placeholder="https://youtube.com/..." value={editForm.youtube || ''} onChange={e => setEditForm(p => ({ ...p, youtube: e.target.value }))} />
-        </div>
-      </div>
-      <div className="space-y-1">
-        <Label htmlFor="youtube_api_key" className="text-xs font-semibold text-gray-500 uppercase tracking-wider">YouTube API Key</Label>
-        <Input id="youtube_api_key" placeholder="Optional" value={editForm.youtube_api_key || ''} onChange={e => setEditForm(p => ({ ...p, youtube_api_key: e.target.value }))} />
-      </div>
-      <div className="space-y-1 md:col-span-2">
-        <Label htmlFor="youtube_channel_id" className="text-xs font-semibold text-gray-500 uppercase tracking-wider">YouTube Channel ID</Label>
-        <Input id="youtube_channel_id" placeholder="Optional" value={editForm.youtube_channel_id || ''} onChange={e => setEditForm(p => ({ ...p, youtube_channel_id: e.target.value }))} />
-      </div>
-      <div className="md:col-span-2 flex gap-3 pt-2">
-        <Button onClick={handleSave} disabled={saving} className="bg-[#1B3A1F] hover:bg-[#2c5831] text-white">
-          <Save className="h-4 w-4 mr-2" />
-          {saving ? 'Saving...' : 'Save Branch'}
-        </Button>
-        <Button variant="outline" onClick={handleCancel}>
-          <X className="h-4 w-4 mr-2" /> Cancel
-        </Button>
-      </div>
-    </div>
-  );
-
   if (loading) {
     return (
       <div className="space-y-4">
@@ -214,7 +223,7 @@ const ContactAdmin = () => {
           <h3 className="text-base font-semibold text-gray-700 mb-1 flex items-center gap-2">
             <Plus className="h-4 w-4 text-green-600" /> New Branch
           </h3>
-          <BranchForm />
+          <BranchForm editForm={editForm} setEditForm={setEditForm} handleSave={handleSave} handleCancel={handleCancel} saving={saving} />
         </div>
       )}
 
@@ -258,7 +267,7 @@ const ContactAdmin = () => {
 
             {editingId === branch.id ? (
               <div className="p-4">
-                <BranchForm />
+                <BranchForm editForm={editForm} setEditForm={setEditForm} handleSave={handleSave} handleCancel={handleCancel} saving={saving} />
               </div>
             ) : (
               <div className="px-5 py-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-sm text-gray-600">

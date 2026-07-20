@@ -103,7 +103,7 @@ const Agents = () => {
                       <p className="text-sm font-semibold text-accent mt-0.5">Real Estate Consultant</p>
                     </div>
                     <div className="space-y-2 text-sm text-muted-foreground pt-2 border-t border-border/50">
-                      <a href={`mailto:${agent.email}`} className="flex items-center gap-2 hover:text-accent transition-colors">
+                      <a href={`https://mail.google.com/mail/?view=cm&fs=1&to=${agent.email}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-accent transition-colors">
                         <Mail className="h-4 w-4 text-accent flex-shrink-0" />
                         <span className="truncate">{agent.email}</span>
                       </a>
