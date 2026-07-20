@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 
 interface ContactDetails {
+  branch_name?: string | null;
   phone: string | null;
   whatsapp: string | null;
   address: string | null;
@@ -29,7 +30,8 @@ interface ContactDetails {
 const Contact = () => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [contactDetails, setContactDetails] = useState<ContactDetails | null>(null);
+  const [branches, setBranches] = useState<ContactDetails[]>([]);
+  const [activeBranchIndex, setActiveBranchIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
     fullName: '',
@@ -44,24 +46,26 @@ const Contact = () => {
       setLoading(true);
       const { data, error } = await supabase
         .from('contacts')
-        .select('phone, whatsapp, address, facebook, instagram, youtube')
-        .single();
+        .select('branch_name, phone, whatsapp, address, facebook, instagram, youtube')
+        .order('id', { ascending: true });
 
       if (error && error.code !== 'PGRST116') {
         console.error('Error fetching contact details:', error);
         toast({ title: 'Error', description: 'Could not load contact information.', variant: 'destructive' });
-      } else if (data) {
-        setContactDetails(data);
+      } else if (data && data.length > 0) {
+        setBranches(data);
       }
       setLoading(false);
     };
     fetchContactDetails();
   }, [toast]);
 
+  const contactDetails = branches[activeBranchIndex];
+
   const handleWhatsApp = () => {
     if (!contactDetails?.whatsapp) return;
     const message = encodeURIComponent('Hello! I am interested in your real estate services. Could you please provide more information?');
-    window.open(`https://wa.me/${contactDetails.whatsapp}?text=${message}`, '_blank');
+    window.open(`https://wa.me/${contactDetails.whatsapp.replace(/\D/g,'')}?text=${message}`, '_blank');
   };
 
   const handleCall = () => {
@@ -78,8 +82,6 @@ const Contact = () => {
     setIsSubmitting(true);
 
     try {
-      // 1. Insert into inquiries (Leads)
-      // Generate UUID client-side since the DB default was removed by Prisma
       const { error: dbError } = await supabase.from('inquiries').insert([{
         id: crypto.randomUUID(),
         full_name: formData.fullName,
@@ -92,7 +94,6 @@ const Contact = () => {
 
       if (dbError) throw dbError;
 
-      // Form submitted successfully, inquiry saved to database
       toast({ title: "Message Sent!", description: "Thank you! We will get back to you shortly." });
       setFormData({ fullName: '', phone: '', email: '', propertyInterest: '', message: '' });
     } catch (error) {
@@ -123,7 +124,12 @@ const Contact = () => {
       title: 'Get Directions',
       details: contactDetails.address || 'Not available',
       subtitle: 'Visit us for consultation',
-      action: () => contactDetails.address && window.open(`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(contactDetails.address)}`, '_blank')
+      action: () => contactDetails.address && window.open(
+        contactDetails.address.startsWith('http') 
+          ? contactDetails.address 
+          : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(contactDetails.address)}`, 
+        '_blank'
+      )
     }
   ] : [];
 
@@ -179,10 +185,30 @@ const Contact = () => {
           <div className="space-y-6">
             <Card className="property-card">
               <CardContent className="p-8">
-                <h3 className="text-2xl font-semibold text-foreground mb-6">Quick Contacts</h3>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
+                  <h3 className="text-2xl font-semibold text-foreground">Quick Contacts</h3>
+                  
+                  {/* Branch Selector */}
+                  {branches.length > 1 && (
+                    <div className="flex flex-wrap gap-2">
+                      {branches.map((b, i) => (
+                        <Button 
+                          key={i} 
+                          variant={activeBranchIndex === i ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => setActiveBranchIndex(i)}
+                          className={activeBranchIndex === i ? 'bg-[#1B3A1F] text-white hover:bg-[#2c5831]' : 'hover:bg-gray-100'}
+                        >
+                          {b.branch_name || `Branch ${i + 1}`}
+                        </Button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
                 <div className="space-y-4">
                   {contactInfo.map((info, index) => (
-                    <Card key={info.title} className="property-card cursor-pointer animate-slide-up" style={{ animationDelay: `${index * 0.1}s` }} onClick={info.action}>
+                    <Card key={info.title} className="property-card cursor-pointer animate-slide-up transition-transform hover:-translate-y-1" style={{ animationDelay: `${index * 0.1}s` }} onClick={info.action}>
                       <CardContent className="p-6">
                         <div className="flex items-start space-x-4">
                           <div className="w-12 h-12 bg-accent/10 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -190,7 +216,7 @@ const Contact = () => {
                           </div>
                           <div>
                             <h4 className="text-lg font-semibold text-foreground mb-1">{info.title}</h4>
-                            <p className="text-accent font-medium mb-1">{info.details}</p>
+                            <p className="text-accent font-medium mb-1 break-all line-clamp-1">{info.details}</p>
                             <p className="text-sm text-muted-foreground">{info.subtitle}</p>
                           </div>
                         </div>
@@ -205,28 +231,36 @@ const Contact = () => {
               <Button className="btn-primary h-14 text-lg" onClick={handleCall} disabled={!contactDetails?.phone}>
                 <Phone className="h-5 w-5 mr-2" /> Call Now
               </Button>
-              <Button className="h-14 text-lg bg-green-600 hover:bg-green-700" onClick={handleWhatsApp} disabled={!contactDetails?.whatsapp}>
+              <Button className="h-14 text-lg bg-green-600 hover:bg-green-700 text-white" onClick={handleWhatsApp} disabled={!contactDetails?.whatsapp}>
                 <MessageCircle className="h-5 w-5 mr-2" /> WhatsApp
               </Button>
             </div>
 
-            <Card className="property-card mt-6">
-              <CardContent className="p-6">
-                <h4 className="text-lg font-semibold text-foreground mb-4">Follow Us</h4>
-                <div className="flex space-x-4">
-                  <Button variant="outline" size="sm" className="flex-1" onClick={() => window.open(contactDetails?.facebook, '_blank')} disabled={!contactDetails?.facebook}>
-                    <Facebook className="h-4 w-4 mr-2" /> Facebook
-                  </Button>
-                  <Button variant="outline" size="sm" className="flex-1" onClick={() => window.open(contactDetails?.instagram, '_blank')} disabled={!contactDetails?.instagram}>
-                    <Instagram className="h-4 w-4 mr-2" /> Instagram
-                  </Button>
-                  <Button variant="outline" size="sm" className="flex-1" onClick={() => window.open(contactDetails?.youtube, '_blank')} disabled={!contactDetails?.youtube}>
-                    <Youtube className="h-4 w-4 mr-2" /> YouTube
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-
+            {/* Render social media only if this specific branch has at least one link */}
+            {(contactDetails?.facebook || contactDetails?.instagram || contactDetails?.youtube) && (
+              <Card className="property-card mt-6">
+                <CardContent className="p-6">
+                  <h4 className="text-lg font-semibold text-foreground mb-4">Follow {contactDetails.branch_name || 'Us'}</h4>
+                  <div className="flex space-x-4">
+                    {contactDetails?.facebook && (
+                      <Button variant="outline" size="sm" className="flex-1 hover:text-[#1877F2]" onClick={() => window.open(contactDetails.facebook!, '_blank')}>
+                        <Facebook className="h-4 w-4 mr-2" /> Facebook
+                      </Button>
+                    )}
+                    {contactDetails?.instagram && (
+                      <Button variant="outline" size="sm" className="flex-1 hover:text-[#E4405F]" onClick={() => window.open(contactDetails.instagram!, '_blank')}>
+                        <Instagram className="h-4 w-4 mr-2" /> Instagram
+                      </Button>
+                    )}
+                    {contactDetails?.youtube && (
+                      <Button variant="outline" size="sm" className="flex-1 hover:text-[#FF0000]" onClick={() => window.open(contactDetails.youtube!, '_blank')}>
+                        <Youtube className="h-4 w-4 mr-2" /> YouTube
+                      </Button>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </div>
         </div>
       </div>

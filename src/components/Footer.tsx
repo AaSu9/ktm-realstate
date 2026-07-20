@@ -85,7 +85,15 @@ const Footer = () => {
                     {branch.address && (
                       <div className="flex items-start gap-2 pl-6">
                         <MapPin className="h-4 w-4 text-primary-foreground/60 flex-shrink-0 mt-0.5" />
-                        <span className="text-primary-foreground/80 text-sm">{branch.address}</span>
+                        {branch.address.startsWith('http') ? (
+                          <a href={branch.address} target="_blank" rel="noreferrer" className="text-primary-foreground/80 text-sm hover:text-accent transition-colors break-all">
+                            View on Google Maps
+                          </a>
+                        ) : (
+                          <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(branch.address)}`} target="_blank" rel="noreferrer" className="text-primary-foreground/80 text-sm hover:text-accent transition-colors">
+                            {branch.address}
+                          </a>
+                        )}
                       </div>
                     )}
                     {branch.phone && (
@@ -96,26 +104,33 @@ const Footer = () => {
                         </a>
                       </div>
                     )}
+                    {/* Social Media for this branch */}
+                    <div className="flex space-x-3 pl-6 pt-2">
+                      {branch.whatsapp && (
+                        <a href={`https://wa.me/${branch.whatsapp.replace(/\D/g,'')}`} target="_blank" rel="noreferrer" className="text-primary-foreground/60 hover:text-green-500 transition-colors" title="WhatsApp">
+                          <MessageCircle className="h-4 w-4" />
+                        </a>
+                      )}
+                      {branch.facebook && (
+                        <a href={branch.facebook} target="_blank" rel="noreferrer" className="text-primary-foreground/60 hover:text-[#1877F2] transition-colors" title="Facebook">
+                          <Facebook className="h-4 w-4" />
+                        </a>
+                      )}
+                      {branch.instagram && (
+                        <a href={branch.instagram} target="_blank" rel="noreferrer" className="text-primary-foreground/60 hover:text-[#E4405F] transition-colors" title="Instagram">
+                          <Instagram className="h-4 w-4" />
+                        </a>
+                      )}
+                      {branch.youtube && (
+                        <a href={branch.youtube} target="_blank" rel="noreferrer" className="text-primary-foreground/60 hover:text-[#FF0000] transition-colors" title="YouTube">
+                          <Youtube className="h-4 w-4" />
+                        </a>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
             )}
-
-            {/* Social Media (from primary branch) */}
-            <div className="flex space-x-3">
-              <Button variant="outline" size="sm" className="border-accent text-accent hover:bg-accent hover:text-accent-foreground" onClick={() => window.open(primaryBranch?.facebook || '', '_blank')} disabled={!primaryBranch?.facebook}>
-                <Facebook className="h-4 w-4" />
-              </Button>
-              <Button variant="outline" size="sm" className="border-accent text-accent hover:bg-accent hover:text-accent-foreground" onClick={() => window.open(primaryBranch?.instagram || '', '_blank')} disabled={!primaryBranch?.instagram}>
-                <Instagram className="h-4 w-4" />
-              </Button>
-              <Button variant="outline" size="sm" className="border-accent text-accent hover:bg-accent hover:text-accent-foreground" onClick={() => window.open(primaryBranch?.youtube || '', '_blank')} disabled={!primaryBranch?.youtube}>
-                <Youtube className="h-4 w-4" />
-              </Button>
-              <Button variant="outline" size="sm" className="border-green-500 text-green-500 hover:bg-green-500 hover:text-white" onClick={() => window.open(`https://wa.me/${primaryBranch?.whatsapp}`, '_blank')} disabled={!primaryBranch?.whatsapp}>
-                <MessageCircle className="h-4 w-4" />
-              </Button>
-            </div>
           </div>
 
           {/* Quick Links */}
