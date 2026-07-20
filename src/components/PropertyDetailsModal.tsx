@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { MapPin, Bed, Bath, Square, Phone, MessageCircle, Mail, Calendar, Star, Play, Video, Youtube, Facebook, Instagram, Sofa, UtensilsCrossed, Home, Layers, Ruler, CheckCircle2, Compass, Tags, Eye, Globe, Car } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import EMICalculator from '@/components/EMICalculator';
@@ -70,6 +70,15 @@ const PropertyDetailsModal = ({ property, isOpen, onClose }: PropertyDetailsModa
   const [agent, setAgent] = useState<any | null>(null);
   const [agentLoading, setAgentLoading] = useState(false);
   const { toast } = useToast();
+  const formRef = useRef<HTMLFormElement | null>(null);
+
+  useEffect(() => {
+    if (showContactForm) {
+      setTimeout(() => {
+        formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 80);
+    }
+  }, [showContactForm]);
 
   const getInitials = (name: string) => {
     return name
@@ -747,7 +756,7 @@ const PropertyDetailsModal = ({ property, isOpen, onClose }: PropertyDetailsModa
 
           {/* Contact Form */}
           {showContactForm && (
-            <form onSubmit={handleSubmitInquiry} className="space-y-4 border-t pt-4">
+            <form ref={formRef} onSubmit={handleSubmitInquiry} className="space-y-4 border-t pt-4">
               <h3 className="text-lg font-semibold">Send us a message</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
