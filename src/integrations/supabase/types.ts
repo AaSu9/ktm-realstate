@@ -59,6 +59,7 @@ export type Database = {
       contacts: {
         Row: {
           address: string | null
+          branch_name: string | null
           facebook: string | null
           id: number
           instagram: string | null
@@ -70,6 +71,7 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          branch_name?: string | null
           facebook?: string | null
           id?: number
           instagram?: string | null
@@ -81,6 +83,7 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          branch_name?: string | null
           facebook?: string | null
           id?: number
           instagram?: string | null
