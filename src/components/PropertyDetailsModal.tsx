@@ -2,8 +2,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
-import { MapPin, Bed, Bath, Square, Phone, MessageCircle, Mail, Calendar, Star, Play, Video, Youtube } from 'lucide-react';
-import { useState } from 'react';
+import { MapPin, Bed, Bath, Square, Phone, MessageCircle, Mail, Calendar, Star, Play, Video, Youtube, Facebook, Instagram } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import EMICalculator from '@/components/EMICalculator';
@@ -48,26 +48,75 @@ const PropertyDetailsModal = ({ property, isOpen, onClose }: PropertyDetailsModa
   });
   const [showContactForm, setShowContactForm] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [agent, setAgent] = useState<any | null>(null);
+  const [agentLoading, setAgentLoading] = useState(false);
   const { toast } = useToast();
+
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  useEffect(() => {
+    if (!isOpen || !property) return;
+    
+    // Check if the property has an agent assigned (support camelCase and snake_case)
+    const agentId = (property as any).agentId || (property as any).agent_id;
+    if (!agentId) {
+      setAgent(null);
+      return;
+    }
+
+    const fetchAgent = async () => {
+      setAgentLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('User')
+          .select('id, name, email, phone, avatar, designation, facebookUrl, instagramUrl, whatsappNumber')
+          .eq('id', agentId)
+          .single();
+
+        if (error) throw error;
+        setAgent(data);
+      } catch (err) {
+        console.error('Error fetching property agent:', err);
+        setAgent(null);
+      } finally {
+        setAgentLoading(false);
+      }
+    };
+
+    fetchAgent();
+  }, [isOpen, property]);
 
   if (!property) return null;
 
   const handleContact = async (type: 'phone' | 'whatsapp' | 'email' | 'form') => {
+    // Prefer agent's direct contact, fallback to company default details
+    const phone = agent?.phone || '+9779741690374';
+    const email = agent?.email || 'sumanghimire138@gmail.com';
+    const whatsapp = agent?.whatsappNumber || agent?.phone || '+9779741690374';
+
     if (type === 'phone') {
-      window.location.href = 'tel:+9779741690374';
+      window.location.href = `tel:${phone}`;
       return;
     }
     
     if (type === 'whatsapp') {
       const message = `Hi! I'm interested in the property: ${property.title} located at ${property.location}. Price: NPR ${property.price.toLocaleString()}. Can you provide more details?`;
-      window.open(`https://wa.me/9779741690374?text=${encodeURIComponent(message)}`, '_blank');
+      const waNumber = whatsapp.replace(/[^0-9]/g, '');
+      window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`, '_blank');
       return;
     }
 
     if (type === 'email') {
       const subject = `Inquiry about ${property.title}`;
       const body = `Hi,\n\nI'm interested in the property: ${property.title} located at ${property.location}.\nPrice: NPR ${property.price.toLocaleString()}\n\nPlease provide more details.\n\nThank you.`;
-      window.location.href = `mailto:sumanghimire138@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
       return;
     }
 
@@ -254,21 +303,68 @@ const PropertyDetailsModal = ({ property, isOpen, onClose }: PropertyDetailsModa
 
             {/* Contact Actions */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Contact Us</h3>
-              <div className="grid grid-cols-2 gap-2">
-                <Button onClick={() => handleContact('phone')} className="flex items-center gap-2">
+              <h3 className="text-lg font-semibold">Contact Agent</h3>
+              
+              {agentLoading ? (
+                <div className="flex items-center gap-3 animate-pulse bg-muted/40 p-4 rounded-xl">
+                  <div className="w-12 h-12 bg-muted rounded-full" />
+                  <div className="space-y-2 flex-1">
+                    <div className="h-4 bg-muted rounded w-2/3" />
+                    <div className="h-3 bg-muted rounded w-1/2" />
+                  </div>
+                </div>
+              ) : agent ? (
+                <div className="flex items-start gap-4 bg-card border border-border/80 p-4 rounded-2xl shadow-sm">
+                  <div className="w-16 h-16 rounded-2xl overflow-hidden bg-gradient-to-br from-emerald-400 to-emerald-700 flex items-center justify-center text-white font-bold text-lg flex-shrink-0 shadow-sm">
+                    {agent.avatar ? (
+                      <img src={agent.avatar} alt={agent.name} className="w-full h-full object-cover" />
+                    ) : (
+                      getInitials(agent.name)
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <h4 className="font-bold text-foreground truncate text-md">{agent.name}</h4>
+                    <p className="text-xs font-semibold text-accent mt-0.5 truncate">
+                      {agent.designation || 'Real Estate Consultant'}
+                    </p>
+                    
+                    {/* Socials */}
+                    {(agent.facebookUrl || agent.instagramUrl) && (
+                      <div className="flex items-center gap-2 mt-2">
+                        {agent.facebookUrl && (
+                          <a href={agent.facebookUrl} target="_blank" rel="noopener noreferrer" className="p-1 rounded-full bg-blue-50 hover:bg-blue-100 text-blue-600 transition-colors" title="Facebook">
+                            <Facebook className="h-3.5 w-3.5" />
+                          </a>
+                        )}
+                        {agent.instagramUrl && (
+                          <a href={agent.instagramUrl} target="_blank" rel="noopener noreferrer" className="p-1 rounded-full bg-pink-50 hover:bg-pink-100 text-pink-600 transition-colors" title="Instagram">
+                            <Instagram className="h-3.5 w-3.5" />
+                          </a>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <div className="p-4 bg-muted/30 rounded-2xl border border-dashed border-border text-center text-xs text-muted-foreground">
+                  No direct agent assigned. Contact our support team.
+                </div>
+              )}
+
+              <div className="grid grid-cols-2 gap-2 pt-1">
+                <Button onClick={() => handleContact('phone')} className="flex items-center gap-2 rounded-xl">
                   <Phone className="h-4 w-4" />
                   Call Now
                 </Button>
-                <Button onClick={() => handleContact('whatsapp')} className="flex items-center gap-2 bg-green-600 hover:bg-green-700">
+                <Button onClick={() => handleContact('whatsapp')} className="flex items-center gap-2 bg-green-600 hover:bg-green-700 rounded-xl">
                   <MessageCircle className="h-4 w-4" />
                   WhatsApp
                 </Button>
-                <Button onClick={() => handleContact('email')} variant="outline" className="flex items-center gap-2">
+                <Button onClick={() => handleContact('email')} variant="outline" className="flex items-center gap-2 rounded-xl">
                   <Mail className="h-4 w-4" />
                   Email
                 </Button>
-                <Button onClick={() => handleContact('form')} variant="outline" className="flex items-center gap-2">
+                <Button onClick={() => handleContact('form')} variant="outline" className="flex items-center gap-2 rounded-xl">
                   <MessageCircle className="h-4 w-4" />
                   Send Message
                 </Button>
