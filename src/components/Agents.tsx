@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import type { Database } from '@/integrations/supabase/types';
 import { Mail, Phone, User as UserIcon, Facebook, Instagram } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 
@@ -26,14 +27,14 @@ const Agents = () => {
   useEffect(() => {
     const fetchAgents = async () => {
       try {
-        const { data, error } = await (supabase as any)
-          .from('User')
+        const { data, error } = await supabase
+          .from('User' as keyof Database['public']['Tables'])
           .select('id, name, email, phone, avatar, role, isActive, designation, bio, facebookUrl, instagramUrl, whatsappNumber, showOnWebsite')
           .eq('isActive', true)
           .eq('showOnWebsite', true);
 
         if (error) throw error;
-        setAgents(data || []);
+        setAgents((data as unknown as Agent[]) || []);
       } catch (err) {
         console.error('Error fetching agents:', err);
       } finally {

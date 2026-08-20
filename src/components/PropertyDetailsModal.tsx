@@ -120,7 +120,7 @@ const PropertyDetailsModal = ({ property, isOpen, onClose }: PropertyDetailsModa
         const { data, error } = await supabase
           .from('User' as unknown as 'contacts')
           .select('id, name, email, phone, avatar, designation, facebookUrl, instagramUrl, whatsappNumber')
-          .eq('id', agentId as any)
+          .eq('id', agentId as string)
           .single();
 
         if (error) throw error;

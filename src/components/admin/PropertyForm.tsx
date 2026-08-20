@@ -190,11 +190,11 @@ const PropertyForm = ({ property, onSubmit, onCancel }: PropertyFormProps) => {
       }
 
       onSubmit();
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error saving property:', error);
       toast({
         title: "Error",
-        description: error?.message || "Failed to save property",
+        description: error instanceof Error ? error.message : "Failed to save property",
         variant: "destructive",
       });
     } finally {
