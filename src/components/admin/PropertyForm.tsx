@@ -154,7 +154,7 @@ const PropertyForm = ({ property, onSubmit, onCancel }: PropertyFormProps) => {
         youtube_url: formData.youtube_url || null,
         tiktok_url: formData.tiktok_url || null,
         map_url: formData.map_url || null,
-        property_id: formData.property_id || '',
+        property_id: formData.property_id?.trim() || `PROP-${Math.floor(1000 + Math.random() * 9000)}`,
       };
 
       if (property?.id) {
