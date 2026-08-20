@@ -2,7 +2,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
-import { MapPin, Bed, Bath, Square, Phone, MessageCircle, Mail, Calendar, Star, Play, Video, Youtube, Facebook, Instagram, Sofa, UtensilsCrossed, Home, Layers, Ruler, CheckCircle2, Compass, Tags, Eye, Globe, Car } from 'lucide-react';
+import { MapPin, Bed, Bath, Square, Phone, MessageCircle, Mail, Calendar, Star, Play, Video, Youtube, Facebook, Instagram, Sofa, UtensilsCrossed, Home, Layers, Ruler, CheckCircle2, Compass, Tags, Eye, Globe, Car, Droplets, Columns3, ArrowUpDown, Hammer, Shield, Armchair, CookingPot } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -120,7 +120,7 @@ const PropertyDetailsModal = ({ property, isOpen, onClose }: PropertyDetailsModa
         const { data, error } = await supabase
           .from('User' as unknown as 'contacts')
           .select('id, name, email, phone, avatar, designation, facebookUrl, instagramUrl, whatsappNumber')
-          .eq('id', agentId)
+          .eq('id', agentId as any)
           .single();
 
         if (error) throw error;
@@ -514,7 +514,7 @@ const PropertyDetailsModal = ({ property, isOpen, onClose }: PropertyDetailsModa
             </div>
           </div>
 
-          {/* SECTION: Overview Grid Card */}
+          {/* SECTION: Unified Property Overview Card */}
           <div className="bg-white border border-border rounded-3xl p-6 space-y-4 shadow-sm animate-fade-in transition-all">
             <div className="flex items-center gap-2 border-b pb-3 border-border/60">
               <Compass className="h-5 w-5 text-emerald-600 animate-pulse animate-duration-1000" />
@@ -522,134 +522,112 @@ const PropertyDetailsModal = ({ property, isOpen, onClose }: PropertyDetailsModa
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 text-sm">
+              {/* --- Core Info --- */}
               <div className="flex justify-between items-center py-2 border-b border-border/40 hover:bg-muted/10 px-2 rounded-lg transition-colors">
                 <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><Home className="h-4 w-4 text-emerald-500" /> Property Type:</span>
                 <span className="font-semibold text-foreground capitalize">{property.property_type}</span>
               </div>
               <div className="flex justify-between items-center py-2 border-b border-border/40 hover:bg-muted/10 px-2 rounded-lg transition-colors">
-                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><Tags className="h-4 w-4 text-emerald-500" /> Purpose:</span>
+                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><Tags className="h-4 w-4 text-violet-500" /> Purpose:</span>
                 <span className="font-semibold text-foreground capitalize">For {property.category === 'sale' ? 'Sale' : 'Rent'}</span>
               </div>
+
+              {/* --- Structure & Rooms --- */}
               <div className="flex justify-between items-center py-2 border-b border-border/40 hover:bg-muted/10 px-2 rounded-lg transition-colors">
-                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><Compass className="h-4 w-4 text-emerald-500" /> Property Face:</span>
-                <span className="font-semibold text-foreground">{property.faceDirection || 'N/A'}</span>
+                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><Bed className="h-4 w-4 text-blue-500" /> Bedrooms:</span>
+                <span className="font-semibold text-foreground">{property.bedrooms || 'N/A'}</span>
               </div>
               <div className="flex justify-between items-center py-2 border-b border-border/40 hover:bg-muted/10 px-2 rounded-lg transition-colors">
-                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><Ruler className="h-4 w-4 text-emerald-500" /> Land Area:</span>
+                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><Bath className="h-4 w-4 text-cyan-500" /> Bathrooms:</span>
+                <span className="font-semibold text-foreground">{property.bathrooms || 'N/A'}</span>
+              </div>
+              <div className="flex justify-between items-center py-2 border-b border-border/40 hover:bg-muted/10 px-2 rounded-lg transition-colors">
+                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><Armchair className="h-4 w-4 text-amber-500" /> Living Rooms:</span>
+                <span className="font-semibold text-foreground">{property.livingRooms || 'N/A'}</span>
+              </div>
+              <div className="flex justify-between items-center py-2 border-b border-border/40 hover:bg-muted/10 px-2 rounded-lg transition-colors">
+                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><CookingPot className="h-4 w-4 text-orange-500" /> Kitchens:</span>
+                <span className="font-semibold text-foreground">{property.kitchens || 'N/A'}</span>
+              </div>
+              <div className="flex justify-between items-center py-2 border-b border-border/40 hover:bg-muted/10 px-2 rounded-lg transition-colors">
+                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><Layers className="h-4 w-4 text-indigo-500" /> Total Floors:</span>
+                <span className="font-semibold text-foreground">{property.totalFloors || 'N/A'}</span>
+              </div>
+              <div className="flex justify-between items-center py-2 border-b border-border/40 hover:bg-muted/10 px-2 rounded-lg transition-colors">
+                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><Sofa className="h-4 w-4 text-pink-500" /> Furnishing:</span>
+                <span className="font-semibold text-foreground">{property.furnishing || 'N/A'}</span>
+              </div>
+
+              {/* --- Land & Dimensions --- */}
+              <div className="flex justify-between items-center py-2 border-b border-border/40 hover:bg-muted/10 px-2 rounded-lg transition-colors">
+                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><Ruler className="h-4 w-4 text-teal-500" /> Land Area:</span>
                 <span className="font-semibold text-foreground">{property.landArea || 'N/A'}</span>
               </div>
               <div className="flex justify-between items-center py-2 border-b border-border/40 hover:bg-muted/10 px-2 rounded-lg transition-colors">
-                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><Calendar className="h-4 w-4 text-emerald-500" /> Year Built:</span>
-                <span className="font-semibold text-foreground">{property.yearBuilt || 'N/A'}</span>
+                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><Square className="h-4 w-4 text-sky-500" /> Built-up Area:</span>
+                <span className="font-semibold text-foreground">{property.area_sqft ? `${property.area_sqft} sqft` : 'N/A'}</span>
               </div>
               <div className="flex justify-between items-center py-2 border-b border-border/40 hover:bg-muted/10 px-2 rounded-lg transition-colors">
-                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><Layers className="h-4 w-4 text-emerald-500" /> Road Access:</span>
-                <span className="font-semibold text-foreground">{property.roadSize || 'N/A'}</span>
-              </div>
-              <div className="flex justify-between items-center py-2 border-b border-border/40 hover:bg-muted/10 px-2 rounded-lg transition-colors">
-                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><MapPin className="h-4 w-4 text-emerald-500" /> Road Type:</span>
-                <span className="font-semibold text-foreground">{property.roadType || 'N/A'}</span>
-              </div>
-              <div className="flex justify-between items-center py-2 border-b border-border/40 hover:bg-muted/10 px-2 rounded-lg transition-colors">
-                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><Ruler className="h-4 w-4 text-emerald-500" /> Dimension:</span>
+                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><ArrowUpDown className="h-4 w-4 text-lime-600" /> Dimension:</span>
                 <span className="font-semibold text-foreground">{property.dimension || 'N/A'}</span>
               </div>
               <div className="flex justify-between items-center py-2 border-b border-border/40 hover:bg-muted/10 px-2 rounded-lg transition-colors">
-                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><CheckCircle2 className="h-4 w-4 text-emerald-500" /> Negotiable:</span>
-                <span className="font-semibold text-foreground">{property.negotiable !== false ? 'Yes' : 'No'}</span>
+                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><Compass className="h-4 w-4 text-rose-500" /> Property Face:</span>
+                <span className="font-semibold text-foreground">{property.faceDirection || 'N/A'}</span>
+              </div>
+
+              {/* --- Technical / Structural --- */}
+              <div className="flex justify-between items-center py-2 border-b border-border/40 hover:bg-muted/10 px-2 rounded-lg transition-colors">
+                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><Columns3 className="h-4 w-4 text-stone-500" /> Pillar Size:</span>
+                <span className="font-semibold text-foreground">{property.pillarSize || 'N/A'}</span>
               </div>
               <div className="flex justify-between items-center py-2 border-b border-border/40 hover:bg-muted/10 px-2 rounded-lg transition-colors">
-                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><Calendar className="h-4 w-4 text-emerald-500" /> Date Posted:</span>
-                <span className="font-semibold text-foreground">{new Date(property.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><Droplets className="h-4 w-4 text-blue-400" /> Tank Capacity:</span>
+                <span className="font-semibold text-foreground">{property.tankCapacity || 'N/A'}</span>
               </div>
               <div className="flex justify-between items-center py-2 border-b border-border/40 hover:bg-muted/10 px-2 rounded-lg transition-colors">
-                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><Sofa className="h-4 w-4 text-emerald-500" /> Furnishing:</span>
-                <span className="font-semibold text-foreground">{property.furnishing || 'N/A'}</span>
+                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><Hammer className="h-4 w-4 text-yellow-600" /> Year Built:</span>
+                <span className="font-semibold text-foreground">{property.yearBuilt || 'N/A'}</span>
               </div>
               <div className="flex justify-between items-center py-2 border-b border-border/40 hover:bg-muted/10 px-2 rounded-lg transition-colors">
-                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><Eye className="h-4 w-4 text-emerald-500" /> Views:</span>
-                <span className="font-semibold text-foreground">{property.views || 0}</span>
+                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><Car className="h-4 w-4 text-slate-500" /> Parking:</span>
+                <span className="font-semibold text-foreground">{property.parking || 'N/A'}</span>
               </div>
+
+              {/* --- Road & Access --- */}
+              <div className="flex justify-between items-center py-2 border-b border-border/40 hover:bg-muted/10 px-2 rounded-lg transition-colors">
+                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><Shield className="h-4 w-4 text-emerald-600" /> Road Type:</span>
+                <span className="font-semibold text-foreground">{property.roadType || 'N/A'}</span>
+              </div>
+              <div className="flex justify-between items-center py-2 border-b border-border/40 hover:bg-muted/10 px-2 rounded-lg transition-colors">
+                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><MapPin className="h-4 w-4 text-red-500" /> Road Access:</span>
+                <span className="font-semibold text-foreground">{property.roadSize || 'N/A'}</span>
+              </div>
+
+              {/* --- Location --- */}
               <div className="flex justify-between items-center py-2 border-b border-border/40 hover:bg-muted/10 px-2 rounded-lg transition-colors">
                 <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><Globe className="h-4 w-4 text-emerald-500" /> City & Area:</span>
                 <span className="font-semibold text-foreground">{property.cityArea || property.location || 'N/A'}</span>
               </div>
               <div className="flex justify-between items-center py-2 border-b border-border/40 hover:bg-muted/10 px-2 rounded-lg transition-colors">
-                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><MapPin className="h-4 w-4 text-emerald-500" /> Municipality / Ward:</span>
+                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><MapPin className="h-4 w-4 text-purple-500" /> Municipality / Ward:</span>
                 <span className="font-semibold text-foreground">
                   {property.municipality ? `${property.municipality}${property.wardNumber ? `, Ward ${property.wardNumber}` : ''}` : 'N/A'}
                 </span>
               </div>
-            </div>
-          </div>
 
-          {/* SECTION: Structural Details Card */}
-          <div className="bg-white border border-border rounded-3xl p-6 space-y-4 shadow-sm animate-fade-in transition-all">
-            <div className="flex items-center justify-between bg-primary text-primary-foreground px-5 py-3 rounded-2xl">
-              <span className="font-bold text-md">Property Details</span>
-              <Home className="h-5 w-5" />
-            </div>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm pt-2">
-              <div className="flex items-center gap-3 py-1.5 border-b border-border/30">
-                <CheckCircle2 className="h-5 w-5 text-emerald-600 flex-shrink-0" />
-                <span className="text-muted-foreground">Pillar Size:</span>
-                <span className="font-semibold text-foreground ml-auto">{property.pillarSize || 'N/A'}</span>
+              {/* --- Meta --- */}
+              <div className="flex justify-between items-center py-2 border-b border-border/40 hover:bg-muted/10 px-2 rounded-lg transition-colors">
+                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><CheckCircle2 className="h-4 w-4 text-green-500" /> Negotiable:</span>
+                <span className="font-semibold text-foreground">{property.negotiable !== false ? 'Yes' : 'No'}</span>
               </div>
-              <div className="flex items-center gap-3 py-1.5 border-b border-border/30">
-                <CheckCircle2 className="h-5 w-5 text-emerald-600 flex-shrink-0" />
-                <span className="text-muted-foreground">Tank Capacity:</span>
-                <span className="font-semibold text-foreground ml-auto">{property.tankCapacity || 'N/A'}</span>
+              <div className="flex justify-between items-center py-2 border-b border-border/40 hover:bg-muted/10 px-2 rounded-lg transition-colors">
+                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><Calendar className="h-4 w-4 text-orange-400" /> Date Posted:</span>
+                <span className="font-semibold text-foreground">{new Date(property.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</span>
               </div>
-              <div className="flex items-center gap-3 py-1.5 border-b border-border/30">
-                <CheckCircle2 className="h-5 w-5 text-emerald-600 flex-shrink-0" />
-                <span className="text-muted-foreground">Road Size:</span>
-                <span className="font-semibold text-foreground ml-auto">{property.roadSize || 'N/A'}</span>
-              </div>
-              <div className="flex items-center gap-3 py-1.5 border-b border-border/30">
-                <CheckCircle2 className="h-5 w-5 text-emerald-600 flex-shrink-0" />
-                <span className="text-muted-foreground">Road Type:</span>
-                <span className="font-semibold text-foreground ml-auto">{property.roadType || 'N/A'}</span>
-              </div>
-              <div className="flex items-center gap-3 py-1.5 border-b border-border/30">
-                <CheckCircle2 className="h-5 w-5 text-emerald-600 flex-shrink-0" />
-                <span className="text-muted-foreground">Land Area:</span>
-                <span className="font-semibold text-foreground ml-auto">{property.landArea || 'N/A'}</span>
-              </div>
-              <div className="flex items-center gap-3 py-1.5 border-b border-border/30">
-                <CheckCircle2 className="h-5 w-5 text-emerald-600 flex-shrink-0" />
-                <span className="text-muted-foreground">Beds:</span>
-                <span className="font-semibold text-foreground ml-auto">{property.bedrooms || 'N/A'}</span>
-              </div>
-              <div className="flex items-center gap-3 py-1.5 border-b border-border/30">
-                <CheckCircle2 className="h-5 w-5 text-emerald-600 flex-shrink-0" />
-                <span className="text-muted-foreground">Living Rooms:</span>
-                <span className="font-semibold text-foreground ml-auto">{property.livingRooms || 'N/A'}</span>
-              </div>
-              <div className="flex items-center gap-3 py-1.5 border-b border-border/30">
-                <CheckCircle2 className="h-5 w-5 text-emerald-600 flex-shrink-0" />
-                <span className="text-muted-foreground">Kitchens:</span>
-                <span className="font-semibold text-foreground ml-auto">{property.kitchens || 'N/A'}</span>
-              </div>
-              <div className="flex items-center gap-3 py-1.5 border-b border-border/30">
-                <CheckCircle2 className="h-5 w-5 text-emerald-600 flex-shrink-0" />
-                <span className="text-muted-foreground">Bathrooms:</span>
-                <span className="font-semibold text-foreground ml-auto">{property.bathrooms || 'N/A'}</span>
-              </div>
-              <div className="flex items-center gap-3 py-1.5 border-b border-border/30">
-                <CheckCircle2 className="h-5 w-5 text-emerald-600 flex-shrink-0" />
-                <span className="text-muted-foreground">Property Face Direction:</span>
-                <span className="font-semibold text-foreground ml-auto">{property.faceDirection || 'N/A'}</span>
-              </div>
-              <div className="flex items-center gap-3 py-1.5 border-b border-border/30">
-                <CheckCircle2 className="h-5 w-5 text-emerald-600 flex-shrink-0" />
-                <span className="text-muted-foreground">Parking Space:</span>
-                <span className="font-semibold text-foreground ml-auto">{property.parking || 'N/A'}</span>
-              </div>
-              <div className="flex items-center gap-3 py-1.5 border-b border-border/30">
-                <CheckCircle2 className="h-5 w-5 text-emerald-600 flex-shrink-0" />
-                <span className="text-muted-foreground">Total Floors:</span>
-                <span className="font-semibold text-foreground ml-auto">{property.totalFloors || 'N/A'}</span>
+              <div className="flex justify-between items-center py-2 border-b border-border/40 hover:bg-muted/10 px-2 rounded-lg transition-colors">
+                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><Eye className="h-4 w-4 text-gray-500" /> Views:</span>
+                <span className="font-semibold text-foreground">{property.views || 0}</span>
               </div>
             </div>
           </div>
