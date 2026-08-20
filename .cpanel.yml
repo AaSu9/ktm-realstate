@@ -1,6 +1,5 @@
 ---
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/ktmreale/public_html
-    - /bin/cp -R dist/* $DEPLOYPATH
-    - /bin/cp dist/.htaccess $DEPLOYPATH
+    - export DEPLOYPATH=$HOME/public_html
+    - /bin/cp -r dist/. $DEPLOYPATH
