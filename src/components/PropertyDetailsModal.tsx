@@ -50,6 +50,21 @@ interface Property {
   municipality?: string;
   wardNumber?: number;
   dimension?: string;
+  agentId?: string;
+  agent_id?: string;
+  views?: number;
+}
+
+interface AgentDetails {
+  id: string;
+  name: string;
+  email?: string | null;
+  phone?: string | null;
+  avatar?: string | null;
+  designation?: string | null;
+  facebookUrl?: string | null;
+  instagramUrl?: string | null;
+  whatsappNumber?: string | null;
 }
 
 interface PropertyDetailsModalProps {
@@ -67,7 +82,7 @@ const PropertyDetailsModal = ({ property, isOpen, onClose }: PropertyDetailsModa
   });
   const [showContactForm, setShowContactForm] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [agent, setAgent] = useState<any | null>(null);
+  const [agent, setAgent] = useState<AgentDetails | null>(null);
   const [agentLoading, setAgentLoading] = useState(false);
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement | null>(null);
@@ -93,7 +108,7 @@ const PropertyDetailsModal = ({ property, isOpen, onClose }: PropertyDetailsModa
     if (!isOpen || !property) return;
     
     // Check if the property has an agent assigned (support camelCase and snake_case)
-    const agentId = (property as any).agentId || (property as any).agent_id;
+    const agentId = property.agentId || property.agent_id;
     if (!agentId) {
       setAgent(null);
       return;
@@ -103,13 +118,13 @@ const PropertyDetailsModal = ({ property, isOpen, onClose }: PropertyDetailsModa
       setAgentLoading(true);
       try {
         const { data, error } = await supabase
-          .from('User' as any)
+          .from('User' as unknown as 'contacts')
           .select('id, name, email, phone, avatar, designation, facebookUrl, instagramUrl, whatsappNumber')
           .eq('id', agentId)
           .single();
 
         if (error) throw error;
-        setAgent(data);
+        setAgent(data as unknown as AgentDetails);
       } catch (err) {
         console.error('Error fetching property agent:', err);
         setAgent(null);
@@ -166,10 +181,21 @@ const PropertyDetailsModal = ({ property, isOpen, onClose }: PropertyDetailsModa
 
     setLoading(true);
     try {
+      const generateUUID = () => {
+        if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+          return crypto.randomUUID();
+        }
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+          const r = (Math.random() * 16) | 0;
+          const v = c === 'x' ? r : (r & 0x3) | 0x8;
+          return v.toString(16);
+        });
+      };
+
       const { error } = await supabase
         .from('inquiries')
         .insert([{
-          id: crypto.randomUUID(),
+          id: generateUUID(),
           full_name: contactForm.name,
           email: contactForm.email,
           phone: contactForm.phone,
@@ -542,7 +568,7 @@ const PropertyDetailsModal = ({ property, isOpen, onClose }: PropertyDetailsModa
               </div>
               <div className="flex justify-between items-center py-2 border-b border-border/40 hover:bg-muted/10 px-2 rounded-lg transition-colors">
                 <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><Eye className="h-4 w-4 text-emerald-500" /> Views:</span>
-                <span className="font-semibold text-foreground">{(property as any).views || 0}</span>
+                <span className="font-semibold text-foreground">{property.views || 0}</span>
               </div>
               <div className="flex justify-between items-center py-2 border-b border-border/40 hover:bg-muted/10 px-2 rounded-lg transition-colors">
                 <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><Globe className="h-4 w-4 text-emerald-500" /> City & Area:</span>

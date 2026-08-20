@@ -82,8 +82,19 @@ const Contact = () => {
     setIsSubmitting(true);
 
     try {
+      const generateUUID = () => {
+        if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+          return crypto.randomUUID();
+        }
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+          const r = (Math.random() * 16) | 0;
+          const v = c === 'x' ? r : (r & 0x3) | 0x8;
+          return v.toString(16);
+        });
+      };
+
       const { error: dbError } = await supabase.from('inquiries').insert([{
-        id: crypto.randomUUID(),
+        id: generateUUID(),
         full_name: formData.fullName,
         phone: formData.phone,
         email: formData.email,
