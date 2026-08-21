@@ -6,6 +6,7 @@ import { MapPin, Bed, Bath, Square, Phone, MessageCircle, Mail, Calendar, Star, 
 import { useState, useEffect, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import type { Database } from '@/integrations/supabase/types';
 import EMICalculator from '@/components/EMICalculator';
 
 interface Property {
@@ -118,7 +119,7 @@ const PropertyDetailsModal = ({ property, isOpen, onClose }: PropertyDetailsModa
       setAgentLoading(true);
       try {
         const { data, error } = await supabase
-          .from('User' as unknown as 'contacts')
+          .from('User' as keyof Database['public']['Tables'])
           .select('id, name, email, phone, avatar, designation, facebookUrl, instagramUrl, whatsappNumber')
           .eq('id', agentId as string)
           .single();
@@ -305,114 +306,7 @@ const PropertyDetailsModal = ({ property, isOpen, onClose }: PropertyDetailsModa
             </div>
           )}
 
-          {/* Premium Core Specs Grid (Full Width) */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-muted/10 p-3 rounded-2xl border border-border/40">
-            
-            {/* 1. Property Type */}
-            <div className="flex items-center gap-3 bg-white p-3 rounded-xl border border-border/30 hover:border-emerald-200 hover:shadow-xs transition-all duration-300">
-              <div className="p-2 bg-emerald-50 rounded-lg text-emerald-600 flex-shrink-0">
-                <Home className="h-4.5 w-4.5" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-[9px] text-muted-foreground uppercase font-bold tracking-wider">Type</p>
-                <p className="text-xs font-bold text-foreground capitalize truncate">{property.property_type}</p>
-              </div>
-            </div>
 
-            {/* 2. Area */}
-            {property.landArea || property.area_sqft ? (
-              <div className="flex items-center gap-3 bg-white p-3 rounded-xl border border-border/30 hover:border-emerald-200 hover:shadow-xs transition-all duration-300">
-                <div className="p-2 bg-emerald-50 rounded-lg text-emerald-600 flex-shrink-0">
-                  {property.landArea ? <Ruler className="h-4.5 w-4.5" /> : <Square className="h-4.5 w-4.5" />}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-[9px] text-muted-foreground uppercase font-bold tracking-wider">Area</p>
-                  <p className="text-xs font-bold text-foreground truncate" title={property.landArea || `${property.area_sqft} Sqft`}>
-                    {property.landArea || `${property.area_sqft} Sqft`}
-                  </p>
-                </div>
-              </div>
-            ) : null}
-
-            {/* 3. Bedrooms */}
-            {property.bedrooms ? (
-              <div className="flex items-center gap-3 bg-white p-3 rounded-xl border border-border/30 hover:border-emerald-200 hover:shadow-xs transition-all duration-300">
-                <div className="p-2 bg-emerald-50 rounded-lg text-emerald-600 flex-shrink-0">
-                  <Bed className="h-4.5 w-4.5" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-[9px] text-muted-foreground uppercase font-bold tracking-wider">Bedrooms</p>
-                  <p className="text-xs font-bold text-foreground">{property.bedrooms}</p>
-                </div>
-              </div>
-            ) : null}
-
-            {/* 4. Kitchens */}
-            {property.kitchens ? (
-              <div className="flex items-center gap-3 bg-white p-3 rounded-xl border border-border/30 hover:border-emerald-200 hover:shadow-xs transition-all duration-300">
-                <div className="p-2 bg-emerald-50 rounded-lg text-emerald-600 flex-shrink-0">
-                  <UtensilsCrossed className="h-4.5 w-4.5" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-[9px] text-muted-foreground uppercase font-bold tracking-wider">Kitchen</p>
-                  <p className="text-xs font-bold text-foreground">{property.kitchens}</p>
-                </div>
-              </div>
-            ) : null}
-
-            {/* 5. Bathrooms */}
-            {property.bathrooms ? (
-              <div className="flex items-center gap-3 bg-white p-3 rounded-xl border border-border/30 hover:border-emerald-200 hover:shadow-xs transition-all duration-300">
-                <div className="p-2 bg-emerald-50 rounded-lg text-emerald-600 flex-shrink-0">
-                  <Bath className="h-4.5 w-4.5" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-[9px] text-muted-foreground uppercase font-bold tracking-wider">Bathrooms</p>
-                  <p className="text-xs font-bold text-foreground">{property.bathrooms}</p>
-                </div>
-              </div>
-            ) : null}
-
-            {/* 6. Living Rooms */}
-            {property.livingRooms ? (
-              <div className="flex items-center gap-3 bg-white p-3 rounded-xl border border-border/30 hover:border-emerald-200 hover:shadow-xs transition-all duration-300">
-                <div className="p-2 bg-emerald-50 rounded-lg text-emerald-600 flex-shrink-0">
-                  <Sofa className="h-4.5 w-4.5" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-[9px] text-muted-foreground uppercase font-bold tracking-wider">Living</p>
-                  <p className="text-xs font-bold text-foreground">{property.livingRooms}</p>
-                </div>
-              </div>
-            ) : null}
-
-            {/* 7. Parking */}
-            {property.parking ? (
-              <div className="flex items-center gap-3 bg-white p-3 rounded-xl border border-border/30 hover:border-emerald-200 hover:shadow-xs transition-all duration-300">
-                <div className="p-2 bg-emerald-50 rounded-lg text-emerald-600 flex-shrink-0">
-                  <Car className="h-4.5 w-4.5" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-[9px] text-muted-foreground uppercase font-bold tracking-wider">Parking</p>
-                  <p className="text-xs font-bold text-foreground truncate" title={property.parking}>{property.parking}</p>
-                </div>
-              </div>
-            ) : null}
-
-            {/* 8. Floors */}
-            {property.totalFloors ? (
-              <div className="flex items-center gap-3 bg-white p-3 rounded-xl border border-border/30 hover:border-emerald-200 hover:shadow-xs transition-all duration-300">
-                <div className="p-2 bg-emerald-50 rounded-lg text-emerald-600 flex-shrink-0">
-                  <Layers className="h-4.5 w-4.5" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-[9px] text-muted-foreground uppercase font-bold tracking-wider">Floors</p>
-                  <p className="text-xs font-bold text-foreground">{property.totalFloors}</p>
-                </div>
-              </div>
-            ) : null}
-
-          </div>
 
           {/* Property Details */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -514,120 +408,436 @@ const PropertyDetailsModal = ({ property, isOpen, onClose }: PropertyDetailsModa
             </div>
           </div>
 
-          {/* SECTION: Unified Property Overview Card */}
-          <div className="bg-white border border-border rounded-3xl p-6 space-y-4 shadow-sm animate-fade-in transition-all">
-            <div className="flex items-center gap-2 border-b pb-3 border-border/60">
-              <Compass className="h-5 w-5 text-emerald-600 animate-pulse animate-duration-1000" />
-              <h3 className="text-xl font-bold text-foreground">Property Overview</h3>
+          {/* SECTION: Unified Property Overview & Specifications Section */}
+          <div className="bg-white border border-border rounded-3xl p-5 sm:p-7 space-y-6 shadow-sm animate-fade-in transition-all">
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-4 border-border/60">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 bg-gradient-to-br from-emerald-500 to-teal-700 text-white rounded-2xl shadow-md shadow-emerald-500/20">
+                  <Compass className="h-6 w-6 animate-pulse" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-extrabold text-foreground tracking-tight">Property Overview & Specifications</h3>
+                  <p className="text-xs text-muted-foreground mt-0.5">Key features, structural specs, and location attributes</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-2 flex-wrap">
+                {property.property_id && (
+                  <Badge variant="outline" className="bg-emerald-50/60 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800 font-semibold px-3 py-1 rounded-full text-xs">
+                    ID: {property.property_id}
+                  </Badge>
+                )}
+                <Badge className="bg-emerald-600 text-white font-semibold px-3 py-1 rounded-full text-xs capitalize">
+                  For {property.category === 'sale' ? 'Sale' : 'Rent'}
+                </Badge>
+              </div>
             </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 text-sm">
-              {/* --- Core Info --- */}
-              <div className="flex justify-between items-center py-2 border-b border-border/40 hover:bg-muted/10 px-2 rounded-lg transition-colors">
-                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><Home className="h-4 w-4 text-emerald-500" /> Property Type:</span>
-                <span className="font-semibold text-foreground capitalize">{property.property_type}</span>
-              </div>
-              <div className="flex justify-between items-center py-2 border-b border-border/40 hover:bg-muted/10 px-2 rounded-lg transition-colors">
-                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><Tags className="h-4 w-4 text-violet-500" /> Purpose:</span>
-                <span className="font-semibold text-foreground capitalize">For {property.category === 'sale' ? 'Sale' : 'Rent'}</span>
-              </div>
 
-              {/* --- Structure & Rooms --- */}
-              <div className="flex justify-between items-center py-2 border-b border-border/40 hover:bg-muted/10 px-2 rounded-lg transition-colors">
-                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><Bed className="h-4 w-4 text-blue-500" /> Bedrooms:</span>
-                <span className="font-semibold text-foreground">{property.bedrooms || 'N/A'}</span>
-              </div>
-              <div className="flex justify-between items-center py-2 border-b border-border/40 hover:bg-muted/10 px-2 rounded-lg transition-colors">
-                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><Bath className="h-4 w-4 text-cyan-500" /> Bathrooms:</span>
-                <span className="font-semibold text-foreground">{property.bathrooms || 'N/A'}</span>
-              </div>
-              <div className="flex justify-between items-center py-2 border-b border-border/40 hover:bg-muted/10 px-2 rounded-lg transition-colors">
-                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><Armchair className="h-4 w-4 text-amber-500" /> Living Rooms:</span>
-                <span className="font-semibold text-foreground">{property.livingRooms || 'N/A'}</span>
-              </div>
-              <div className="flex justify-between items-center py-2 border-b border-border/40 hover:bg-muted/10 px-2 rounded-lg transition-colors">
-                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><CookingPot className="h-4 w-4 text-orange-500" /> Kitchens:</span>
-                <span className="font-semibold text-foreground">{property.kitchens || 'N/A'}</span>
-              </div>
-              <div className="flex justify-between items-center py-2 border-b border-border/40 hover:bg-muted/10 px-2 rounded-lg transition-colors">
-                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><Layers className="h-4 w-4 text-indigo-500" /> Total Floors:</span>
-                <span className="font-semibold text-foreground">{property.totalFloors || 'N/A'}</span>
-              </div>
-              <div className="flex justify-between items-center py-2 border-b border-border/40 hover:bg-muted/10 px-2 rounded-lg transition-colors">
-                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><Sofa className="h-4 w-4 text-pink-500" /> Furnishing:</span>
-                <span className="font-semibold text-foreground">{property.furnishing || 'N/A'}</span>
-              </div>
+            {/* Part 1: Interactive Hover Spec Cards (Key Highlights) */}
+            <div className="space-y-2.5">
+              <h4 className="text-[11px] uppercase font-extrabold tracking-wider text-emerald-700 dark:text-emerald-400">Key Attribute Highlights</h4>
+              
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                {/* 1. Property Type */}
+                <div
+                  tabIndex={0}
+                  role="region"
+                  aria-label={`Property Type: ${property.property_type}`}
+                  title={`Property Type: ${property.property_type}`}
+                  className="group relative flex items-center gap-3 p-3.5 rounded-2xl bg-slate-50/80 border border-border/50 hover:border-emerald-500/60 hover:bg-emerald-50/60 transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-[1.04] active:scale-98 cursor-default focus:outline-none focus:ring-2 focus:ring-emerald-500/50 shadow-xs"
+                >
+                  <div className="p-2.5 rounded-xl bg-emerald-100/90 text-emerald-700 group-hover:bg-emerald-600 group-hover:text-white group-hover:scale-110 transition-all duration-300 ease-in-out shadow-xs shrink-0">
+                    <Home className="h-5 w-5 transition-transform duration-300 group-hover:rotate-6" aria-hidden="true" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground group-hover:text-emerald-800 transition-colors duration-200">Type</p>
+                    <p className="text-sm font-bold text-foreground capitalize truncate">{property.property_type}</p>
+                  </div>
+                </div>
 
-              {/* --- Land & Dimensions --- */}
-              <div className="flex justify-between items-center py-2 border-b border-border/40 hover:bg-muted/10 px-2 rounded-lg transition-colors">
-                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><Ruler className="h-4 w-4 text-teal-500" /> Land Area:</span>
-                <span className="font-semibold text-foreground">{property.landArea || 'N/A'}</span>
-              </div>
-              <div className="flex justify-between items-center py-2 border-b border-border/40 hover:bg-muted/10 px-2 rounded-lg transition-colors">
-                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><Square className="h-4 w-4 text-sky-500" /> Built-up Area:</span>
-                <span className="font-semibold text-foreground">{property.area_sqft ? `${property.area_sqft} sqft` : 'N/A'}</span>
-              </div>
-              <div className="flex justify-between items-center py-2 border-b border-border/40 hover:bg-muted/10 px-2 rounded-lg transition-colors">
-                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><ArrowUpDown className="h-4 w-4 text-lime-600" /> Dimension:</span>
-                <span className="font-semibold text-foreground">{property.dimension || 'N/A'}</span>
-              </div>
-              <div className="flex justify-between items-center py-2 border-b border-border/40 hover:bg-muted/10 px-2 rounded-lg transition-colors">
-                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><Compass className="h-4 w-4 text-rose-500" /> Property Face:</span>
-                <span className="font-semibold text-foreground">{property.faceDirection || 'N/A'}</span>
-              </div>
+                {/* 2. Land Area / Sqft */}
+                {(property.landArea || property.area_sqft) && (
+                  <div
+                    tabIndex={0}
+                    role="region"
+                    aria-label={`Area: ${property.landArea || `${property.area_sqft} sqft`}`}
+                    title={`Area: ${property.landArea || `${property.area_sqft} sqft`}`}
+                    className="group relative flex items-center gap-3 p-3.5 rounded-2xl bg-slate-50/80 border border-border/50 hover:border-teal-500/60 hover:bg-teal-50/60 transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-[1.04] active:scale-98 cursor-default focus:outline-none focus:ring-2 focus:ring-teal-500/50 shadow-xs"
+                  >
+                    <div className="p-2.5 rounded-xl bg-teal-100/90 text-teal-700 group-hover:bg-teal-600 group-hover:text-white group-hover:scale-110 transition-all duration-300 ease-in-out shadow-xs shrink-0">
+                      {property.landArea ? <Ruler className="h-5 w-5 transition-transform duration-300 group-hover:rotate-6" aria-hidden="true" /> : <Square className="h-5 w-5 transition-transform duration-300 group-hover:rotate-6" aria-hidden="true" />}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground group-hover:text-teal-800 transition-colors duration-200">
+                        {property.landArea ? 'Land Area' : 'Built-up Area'}
+                      </p>
+                      <p className="text-sm font-bold text-foreground truncate">
+                        {property.landArea || `${property.area_sqft} sqft`}
+                      </p>
+                    </div>
+                  </div>
+                )}
 
-              {/* --- Technical / Structural --- */}
-              <div className="flex justify-between items-center py-2 border-b border-border/40 hover:bg-muted/10 px-2 rounded-lg transition-colors">
-                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><Columns3 className="h-4 w-4 text-stone-500" /> Pillar Size:</span>
-                <span className="font-semibold text-foreground">{property.pillarSize || 'N/A'}</span>
-              </div>
-              <div className="flex justify-between items-center py-2 border-b border-border/40 hover:bg-muted/10 px-2 rounded-lg transition-colors">
-                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><Droplets className="h-4 w-4 text-blue-400" /> Tank Capacity:</span>
-                <span className="font-semibold text-foreground">{property.tankCapacity || 'N/A'}</span>
-              </div>
-              <div className="flex justify-between items-center py-2 border-b border-border/40 hover:bg-muted/10 px-2 rounded-lg transition-colors">
-                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><Hammer className="h-4 w-4 text-yellow-600" /> Year Built:</span>
-                <span className="font-semibold text-foreground">{property.yearBuilt || 'N/A'}</span>
-              </div>
-              <div className="flex justify-between items-center py-2 border-b border-border/40 hover:bg-muted/10 px-2 rounded-lg transition-colors">
-                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><Car className="h-4 w-4 text-slate-500" /> Parking:</span>
-                <span className="font-semibold text-foreground">{property.parking || 'N/A'}</span>
-              </div>
+                {/* 3. Bedrooms */}
+                {property.bedrooms ? (
+                  <div
+                    tabIndex={0}
+                    role="region"
+                    aria-label={`Bedrooms: ${property.bedrooms}`}
+                    title={`Bedrooms: ${property.bedrooms} Bedrooms`}
+                    className="group relative flex items-center gap-3 p-3.5 rounded-2xl bg-slate-50/80 border border-border/50 hover:border-blue-500/60 hover:bg-blue-50/60 transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-[1.04] active:scale-98 cursor-default focus:outline-none focus:ring-2 focus:ring-blue-500/50 shadow-xs"
+                  >
+                    <div className="p-2.5 rounded-xl bg-blue-100/90 text-blue-700 group-hover:bg-blue-600 group-hover:text-white group-hover:scale-110 transition-all duration-300 ease-in-out shadow-xs shrink-0">
+                      <Bed className="h-5 w-5 transition-transform duration-300 group-hover:rotate-6" aria-hidden="true" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground group-hover:text-blue-800 transition-colors duration-200">Bedrooms</p>
+                      <p className="text-sm font-bold text-foreground truncate">{property.bedrooms}</p>
+                    </div>
+                  </div>
+                ) : null}
 
-              {/* --- Road & Access --- */}
-              <div className="flex justify-between items-center py-2 border-b border-border/40 hover:bg-muted/10 px-2 rounded-lg transition-colors">
-                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><Shield className="h-4 w-4 text-emerald-600" /> Road Type:</span>
-                <span className="font-semibold text-foreground">{property.roadType || 'N/A'}</span>
-              </div>
-              <div className="flex justify-between items-center py-2 border-b border-border/40 hover:bg-muted/10 px-2 rounded-lg transition-colors">
-                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><MapPin className="h-4 w-4 text-red-500" /> Road Access:</span>
-                <span className="font-semibold text-foreground">{property.roadSize || 'N/A'}</span>
-              </div>
+                {/* 4. Bathrooms */}
+                {property.bathrooms ? (
+                  <div
+                    tabIndex={0}
+                    role="region"
+                    aria-label={`Bathrooms: ${property.bathrooms}`}
+                    title={`Bathrooms: ${property.bathrooms} Bathrooms`}
+                    className="group relative flex items-center gap-3 p-3.5 rounded-2xl bg-slate-50/80 border border-border/50 hover:border-cyan-500/60 hover:bg-cyan-50/60 transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-[1.04] active:scale-98 cursor-default focus:outline-none focus:ring-2 focus:ring-cyan-500/50 shadow-xs"
+                  >
+                    <div className="p-2.5 rounded-xl bg-cyan-100/90 text-cyan-700 group-hover:bg-cyan-600 group-hover:text-white group-hover:scale-110 transition-all duration-300 ease-in-out shadow-xs shrink-0">
+                      <Bath className="h-5 w-5 transition-transform duration-300 group-hover:rotate-6" aria-hidden="true" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground group-hover:text-cyan-800 transition-colors duration-200">Bathrooms</p>
+                      <p className="text-sm font-bold text-foreground truncate">{property.bathrooms}</p>
+                    </div>
+                  </div>
+                ) : null}
 
-              {/* --- Location --- */}
-              <div className="flex justify-between items-center py-2 border-b border-border/40 hover:bg-muted/10 px-2 rounded-lg transition-colors">
-                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><Globe className="h-4 w-4 text-emerald-500" /> City & Area:</span>
-                <span className="font-semibold text-foreground">{property.cityArea || property.location || 'N/A'}</span>
-              </div>
-              <div className="flex justify-between items-center py-2 border-b border-border/40 hover:bg-muted/10 px-2 rounded-lg transition-colors">
-                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><MapPin className="h-4 w-4 text-purple-500" /> Municipality / Ward:</span>
-                <span className="font-semibold text-foreground">
-                  {property.municipality ? `${property.municipality}${property.wardNumber ? `, Ward ${property.wardNumber}` : ''}` : 'N/A'}
-                </span>
-              </div>
+                {/* 5. Living Rooms */}
+                {property.livingRooms ? (
+                  <div
+                    tabIndex={0}
+                    role="region"
+                    aria-label={`Living Rooms: ${property.livingRooms}`}
+                    title={`Living Rooms: ${property.livingRooms}`}
+                    className="group relative flex items-center gap-3 p-3.5 rounded-2xl bg-slate-50/80 border border-border/50 hover:border-amber-500/60 hover:bg-amber-50/60 transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-[1.04] active:scale-98 cursor-default focus:outline-none focus:ring-2 focus:ring-amber-500/50 shadow-xs"
+                  >
+                    <div className="p-2.5 rounded-xl bg-amber-100/90 text-amber-700 group-hover:bg-amber-600 group-hover:text-white group-hover:scale-110 transition-all duration-300 ease-in-out shadow-xs shrink-0">
+                      <Armchair className="h-5 w-5 transition-transform duration-300 group-hover:rotate-6" aria-hidden="true" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground group-hover:text-amber-800 transition-colors duration-200">Living Rooms</p>
+                      <p className="text-sm font-bold text-foreground truncate">{property.livingRooms}</p>
+                    </div>
+                  </div>
+                ) : null}
 
-              {/* --- Meta --- */}
-              <div className="flex justify-between items-center py-2 border-b border-border/40 hover:bg-muted/10 px-2 rounded-lg transition-colors">
-                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><CheckCircle2 className="h-4 w-4 text-green-500" /> Negotiable:</span>
-                <span className="font-semibold text-foreground">{property.negotiable !== false ? 'Yes' : 'No'}</span>
+                {/* 6. Kitchens */}
+                {property.kitchens ? (
+                  <div
+                    tabIndex={0}
+                    role="region"
+                    aria-label={`Kitchens: ${property.kitchens}`}
+                    title={`Kitchens: ${property.kitchens}`}
+                    className="group relative flex items-center gap-3 p-3.5 rounded-2xl bg-slate-50/80 border border-border/50 hover:border-orange-500/60 hover:bg-orange-50/60 transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-[1.04] active:scale-98 cursor-default focus:outline-none focus:ring-2 focus:ring-orange-500/50 shadow-xs"
+                  >
+                    <div className="p-2.5 rounded-xl bg-orange-100/90 text-orange-700 group-hover:bg-orange-600 group-hover:text-white group-hover:scale-110 transition-all duration-300 ease-in-out shadow-xs shrink-0">
+                      <UtensilsCrossed className="h-5 w-5 transition-transform duration-300 group-hover:rotate-6" aria-hidden="true" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground group-hover:text-orange-800 transition-colors duration-200">Kitchens</p>
+                      <p className="text-sm font-bold text-foreground truncate">{property.kitchens}</p>
+                    </div>
+                  </div>
+                ) : null}
+
+                {/* 7. Parking */}
+                {property.parking ? (
+                  <div
+                    tabIndex={0}
+                    role="region"
+                    aria-label={`Parking: ${property.parking}`}
+                    title={`Parking Facilities: ${property.parking}`}
+                    className="group relative flex items-center gap-3 p-3.5 rounded-2xl bg-slate-50/80 border border-border/50 hover:border-indigo-500/60 hover:bg-indigo-50/60 transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-[1.04] active:scale-98 cursor-default focus:outline-none focus:ring-2 focus:ring-indigo-500/50 shadow-xs"
+                  >
+                    <div className="p-2.5 rounded-xl bg-indigo-100/90 text-indigo-700 group-hover:bg-indigo-600 group-hover:text-white group-hover:scale-110 transition-all duration-300 ease-in-out shadow-xs shrink-0">
+                      <Car className="h-5 w-5 transition-transform duration-300 group-hover:rotate-6" aria-hidden="true" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground group-hover:text-indigo-800 transition-colors duration-200">Parking</p>
+                      <p className="text-sm font-bold text-foreground truncate">{property.parking}</p>
+                    </div>
+                  </div>
+                ) : null}
+
+                {/* 8. Total Floors */}
+                {property.totalFloors ? (
+                  <div
+                    tabIndex={0}
+                    role="region"
+                    aria-label={`Total Floors: ${property.totalFloors}`}
+                    title={`Total Building Floors: ${property.totalFloors}`}
+                    className="group relative flex items-center gap-3 p-3.5 rounded-2xl bg-slate-50/80 border border-border/50 hover:border-purple-500/60 hover:bg-purple-50/60 transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-[1.04] active:scale-98 cursor-default focus:outline-none focus:ring-2 focus:ring-purple-500/50 shadow-xs"
+                  >
+                    <div className="p-2.5 rounded-xl bg-purple-100/90 text-purple-700 group-hover:bg-purple-600 group-hover:text-white group-hover:scale-110 transition-all duration-300 ease-in-out shadow-xs shrink-0">
+                      <Layers className="h-5 w-5 transition-transform duration-300 group-hover:rotate-6" aria-hidden="true" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground group-hover:text-purple-800 transition-colors duration-200">Total Floors</p>
+                      <p className="text-sm font-bold text-foreground truncate">{property.totalFloors}</p>
+                    </div>
+                  </div>
+                ) : null}
+
+                {/* 9. Furnishing */}
+                {property.furnishing ? (
+                  <div
+                    tabIndex={0}
+                    role="region"
+                    aria-label={`Furnishing: ${property.furnishing}`}
+                    title={`Furnishing Status: ${property.furnishing}`}
+                    className="group relative flex items-center gap-3 p-3.5 rounded-2xl bg-slate-50/80 border border-border/50 hover:border-pink-500/60 hover:bg-pink-50/60 transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-[1.04] active:scale-98 cursor-default focus:outline-none focus:ring-2 focus:ring-pink-500/50 shadow-xs"
+                  >
+                    <div className="p-2.5 rounded-xl bg-pink-100/90 text-pink-700 group-hover:bg-pink-600 group-hover:text-white group-hover:scale-110 transition-all duration-300 ease-in-out shadow-xs shrink-0">
+                      <Sofa className="h-5 w-5 transition-transform duration-300 group-hover:rotate-6" aria-hidden="true" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground group-hover:text-pink-800 transition-colors duration-200">Furnishing</p>
+                      <p className="text-sm font-bold text-foreground truncate">{property.furnishing}</p>
+                    </div>
+                  </div>
+                ) : null}
+
+                {/* 10. Property Facing */}
+                {property.faceDirection ? (
+                  <div
+                    tabIndex={0}
+                    role="region"
+                    aria-label={`Property Facing: ${property.faceDirection}`}
+                    title={`Facing Direction: ${property.faceDirection}`}
+                    className="group relative flex items-center gap-3 p-3.5 rounded-2xl bg-slate-50/80 border border-border/50 hover:border-rose-500/60 hover:bg-rose-50/60 transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-[1.04] active:scale-98 cursor-default focus:outline-none focus:ring-2 focus:ring-rose-500/50 shadow-xs"
+                  >
+                    <div className="p-2.5 rounded-xl bg-rose-100/90 text-rose-700 group-hover:bg-rose-600 group-hover:text-white group-hover:scale-110 transition-all duration-300 ease-in-out shadow-xs shrink-0">
+                      <Compass className="h-5 w-5 transition-transform duration-300 group-hover:rotate-6" aria-hidden="true" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground group-hover:text-rose-800 transition-colors duration-200">Facing</p>
+                      <p className="text-sm font-bold text-foreground truncate">{property.faceDirection}</p>
+                    </div>
+                  </div>
+                ) : null}
+
+                {/* 11. Year Built */}
+                {property.yearBuilt ? (
+                  <div
+                    tabIndex={0}
+                    role="region"
+                    aria-label={`Year Built: ${property.yearBuilt}`}
+                    title={`Construction Year: ${property.yearBuilt}`}
+                    className="group relative flex items-center gap-3 p-3.5 rounded-2xl bg-slate-50/80 border border-border/50 hover:border-yellow-500/60 hover:bg-yellow-50/60 transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-[1.04] active:scale-98 cursor-default focus:outline-none focus:ring-2 focus:ring-yellow-500/50 shadow-xs"
+                  >
+                    <div className="p-2.5 rounded-xl bg-yellow-100/90 text-yellow-800 group-hover:bg-yellow-600 group-hover:text-white group-hover:scale-110 transition-all duration-300 ease-in-out shadow-xs shrink-0">
+                      <Hammer className="h-5 w-5 transition-transform duration-300 group-hover:rotate-6" aria-hidden="true" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground group-hover:text-yellow-800 transition-colors duration-200">Year Built</p>
+                      <p className="text-sm font-bold text-foreground truncate">{property.yearBuilt}</p>
+                    </div>
+                  </div>
+                ) : null}
               </div>
-              <div className="flex justify-between items-center py-2 border-b border-border/40 hover:bg-muted/10 px-2 rounded-lg transition-colors">
-                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><Calendar className="h-4 w-4 text-orange-400" /> Date Posted:</span>
-                <span className="font-semibold text-foreground">{new Date(property.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</span>
-              </div>
-              <div className="flex justify-between items-center py-2 border-b border-border/40 hover:bg-muted/10 px-2 rounded-lg transition-colors">
-                <span className="text-muted-foreground flex items-center gap-1.5 font-medium"><Eye className="h-4 w-4 text-gray-500" /> Views:</span>
-                <span className="font-semibold text-foreground">{property.views || 0}</span>
+            </div>
+
+            {/* Part 2: Technical & Location Specifications Table */}
+            <div className="space-y-3 pt-3">
+              <h4 className="text-[11px] uppercase font-extrabold tracking-wider text-emerald-700 dark:text-emerald-400 border-b pb-2 border-border/50">Full Specifications & Attributes</h4>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-1 text-sm">
+                {/* Purpose */}
+                <div 
+                  tabIndex={0}
+                  aria-label={`Purpose: For ${property.category === 'sale' ? 'Sale' : 'Rent'}`}
+                  title={`Listing Purpose: For ${property.category === 'sale' ? 'Sale' : 'Rent'}`}
+                  className="flex justify-between items-center py-2.5 border-b border-border/40 hover:bg-emerald-50/60 px-3 rounded-xl transition-all duration-200 group cursor-default"
+                >
+                  <span className="text-muted-foreground flex items-center gap-2 font-medium">
+                    <Tags className="h-4 w-4 text-violet-500 group-hover:scale-110 transition-transform duration-200" aria-hidden="true" /> 
+                    Purpose:
+                  </span>
+                  <span className="font-semibold text-foreground capitalize">For {property.category === 'sale' ? 'Sale' : 'Rent'}</span>
+                </div>
+
+                {/* Built-up Area */}
+                {property.area_sqft ? (
+                  <div 
+                    tabIndex={0}
+                    aria-label={`Built-up Area: ${property.area_sqft} sqft`}
+                    title={`Built-up Area: ${property.area_sqft} sqft`}
+                    className="flex justify-between items-center py-2.5 border-b border-border/40 hover:bg-emerald-50/60 px-3 rounded-xl transition-all duration-200 group cursor-default"
+                  >
+                    <span className="text-muted-foreground flex items-center gap-2 font-medium">
+                      <Square className="h-4 w-4 text-sky-500 group-hover:scale-110 transition-transform duration-200" aria-hidden="true" /> 
+                      Built-up Area:
+                    </span>
+                    <span className="font-semibold text-foreground">{property.area_sqft} sqft</span>
+                  </div>
+                ) : null}
+
+                {/* Dimension */}
+                {property.dimension ? (
+                  <div 
+                    tabIndex={0}
+                    aria-label={`Dimension: ${property.dimension}`}
+                    title={`Property Dimension: ${property.dimension}`}
+                    className="flex justify-between items-center py-2.5 border-b border-border/40 hover:bg-emerald-50/60 px-3 rounded-xl transition-all duration-200 group cursor-default"
+                  >
+                    <span className="text-muted-foreground flex items-center gap-2 font-medium">
+                      <ArrowUpDown className="h-4 w-4 text-lime-600 group-hover:scale-110 transition-transform duration-200" aria-hidden="true" /> 
+                      Dimension:
+                    </span>
+                    <span className="font-semibold text-foreground">{property.dimension}</span>
+                  </div>
+                ) : null}
+
+                {/* Pillar Size */}
+                {property.pillarSize ? (
+                  <div 
+                    tabIndex={0}
+                    aria-label={`Pillar Size: ${property.pillarSize}`}
+                    title={`Structural Pillar Size: ${property.pillarSize}`}
+                    className="flex justify-between items-center py-2.5 border-b border-border/40 hover:bg-emerald-50/60 px-3 rounded-xl transition-all duration-200 group cursor-default"
+                  >
+                    <span className="text-muted-foreground flex items-center gap-2 font-medium">
+                      <Columns3 className="h-4 w-4 text-stone-500 group-hover:scale-110 transition-transform duration-200" aria-hidden="true" /> 
+                      Pillar Size:
+                    </span>
+                    <span className="font-semibold text-foreground">{property.pillarSize}</span>
+                  </div>
+                ) : null}
+
+                {/* Tank Capacity */}
+                {property.tankCapacity ? (
+                  <div 
+                    tabIndex={0}
+                    aria-label={`Tank Capacity: ${property.tankCapacity}`}
+                    title={`Water Tank Capacity: ${property.tankCapacity}`}
+                    className="flex justify-between items-center py-2.5 border-b border-border/40 hover:bg-emerald-50/60 px-3 rounded-xl transition-all duration-200 group cursor-default"
+                  >
+                    <span className="text-muted-foreground flex items-center gap-2 font-medium">
+                      <Droplets className="h-4 w-4 text-blue-400 group-hover:scale-110 transition-transform duration-200" aria-hidden="true" /> 
+                      Tank Capacity:
+                    </span>
+                    <span className="font-semibold text-foreground">{property.tankCapacity}</span>
+                  </div>
+                ) : null}
+
+                {/* Road Type */}
+                {property.roadType ? (
+                  <div 
+                    tabIndex={0}
+                    aria-label={`Road Type: ${property.roadType}`}
+                    title={`Road Construction Type: ${property.roadType}`}
+                    className="flex justify-between items-center py-2.5 border-b border-border/40 hover:bg-emerald-50/60 px-3 rounded-xl transition-all duration-200 group cursor-default"
+                  >
+                    <span className="text-muted-foreground flex items-center gap-2 font-medium">
+                      <Shield className="h-4 w-4 text-emerald-600 group-hover:scale-110 transition-transform duration-200" aria-hidden="true" /> 
+                      Road Type:
+                    </span>
+                    <span className="font-semibold text-foreground">{property.roadType}</span>
+                  </div>
+                ) : null}
+
+                {/* Road Access / Size */}
+                {property.roadSize ? (
+                  <div 
+                    tabIndex={0}
+                    aria-label={`Road Access: ${property.roadSize}`}
+                    title={`Road Access Size: ${property.roadSize}`}
+                    className="flex justify-between items-center py-2.5 border-b border-border/40 hover:bg-emerald-50/60 px-3 rounded-xl transition-all duration-200 group cursor-default"
+                  >
+                    <span className="text-muted-foreground flex items-center gap-2 font-medium">
+                      <MapPin className="h-4 w-4 text-red-500 group-hover:scale-110 transition-transform duration-200" aria-hidden="true" /> 
+                      Road Access:
+                    </span>
+                    <span className="font-semibold text-foreground">{property.roadSize}</span>
+                  </div>
+                ) : null}
+
+                {/* City & Area */}
+                <div 
+                  tabIndex={0}
+                  aria-label={`City & Area: ${property.cityArea || property.location}`}
+                  title={`City & Area: ${property.cityArea || property.location}`}
+                  className="flex justify-between items-center py-2.5 border-b border-border/40 hover:bg-emerald-50/60 px-3 rounded-xl transition-all duration-200 group cursor-default"
+                >
+                  <span className="text-muted-foreground flex items-center gap-2 font-medium">
+                    <Globe className="h-4 w-4 text-emerald-500 group-hover:scale-110 transition-transform duration-200" aria-hidden="true" /> 
+                    City & Area:
+                  </span>
+                  <span className="font-semibold text-foreground">{property.cityArea || property.location || 'N/A'}</span>
+                </div>
+
+                {/* Municipality / Ward */}
+                <div 
+                  tabIndex={0}
+                  aria-label={`Municipality & Ward: ${property.municipality ? `${property.municipality}${property.wardNumber ? `, Ward ${property.wardNumber}` : ''}` : 'N/A'}`}
+                  title={`Local Municipality / Ward: ${property.municipality ? `${property.municipality}${property.wardNumber ? `, Ward ${property.wardNumber}` : ''}` : 'N/A'}`}
+                  className="flex justify-between items-center py-2.5 border-b border-border/40 hover:bg-emerald-50/60 px-3 rounded-xl transition-all duration-200 group cursor-default"
+                >
+                  <span className="text-muted-foreground flex items-center gap-2 font-medium">
+                    <MapPin className="h-4 w-4 text-purple-500 group-hover:scale-110 transition-transform duration-200" aria-hidden="true" /> 
+                    Municipality / Ward:
+                  </span>
+                  <span className="font-semibold text-foreground">
+                    {property.municipality ? `${property.municipality}${property.wardNumber ? `, Ward ${property.wardNumber}` : ''}` : 'N/A'}
+                  </span>
+                </div>
+
+                {/* Price Negotiable */}
+                <div 
+                  tabIndex={0}
+                  aria-label={`Negotiable: ${property.negotiable !== false ? 'Yes' : 'No'}`}
+                  title={`Price Negotiable: ${property.negotiable !== false ? 'Yes' : 'No'}`}
+                  className="flex justify-between items-center py-2.5 border-b border-border/40 hover:bg-emerald-50/60 px-3 rounded-xl transition-all duration-200 group cursor-default"
+                >
+                  <span className="text-muted-foreground flex items-center gap-2 font-medium">
+                    <CheckCircle2 className="h-4 w-4 text-green-500 group-hover:scale-110 transition-transform duration-200" aria-hidden="true" /> 
+                    Negotiable:
+                  </span>
+                  <span className="font-semibold text-foreground">{property.negotiable !== false ? 'Yes' : 'No'}</span>
+                </div>
+
+                {/* Date Posted */}
+                <div 
+                  tabIndex={0}
+                  aria-label={`Date Posted: ${new Date(property.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}`}
+                  title={`Date Posted: ${new Date(property.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}`}
+                  className="flex justify-between items-center py-2.5 border-b border-border/40 hover:bg-emerald-50/60 px-3 rounded-xl transition-all duration-200 group cursor-default"
+                >
+                  <span className="text-muted-foreground flex items-center gap-2 font-medium">
+                    <Calendar className="h-4 w-4 text-orange-400 group-hover:scale-110 transition-transform duration-200" aria-hidden="true" /> 
+                    Date Posted:
+                  </span>
+                  <span className="font-semibold text-foreground">{new Date(property.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                </div>
+
+                {/* Total Views */}
+                <div 
+                  tabIndex={0}
+                  aria-label={`Total Views: ${property.views || 0}`}
+                  title={`Total Listing Views: ${property.views || 0}`}
+                  className="flex justify-between items-center py-2.5 border-b border-border/40 hover:bg-emerald-50/60 px-3 rounded-xl transition-all duration-200 group cursor-default"
+                >
+                  <span className="text-muted-foreground flex items-center gap-2 font-medium">
+                    <Eye className="h-4 w-4 text-gray-500 group-hover:scale-110 transition-transform duration-200" aria-hidden="true" /> 
+                    Views:
+                  </span>
+                  <span className="font-semibold text-foreground">{property.views || 0}</span>
+                </div>
               </div>
             </div>
           </div>
